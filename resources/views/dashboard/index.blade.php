@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN" x-data="{ dark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" :class="{ 'dark': dark }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calo - 热量管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .progress-ring { transform: rotate(-90deg); }
+        .progress-ring-circle { transition: stroke-dashoffset 0.5s ease; }
+        @media (min-width: 768px) {
+            .mobile-bottom-nav { display: none !important; }
+            .mobile-header-bar { display: none !important; }
+            .desktop-sidebar { display: flex !important; }
+        }
+        @media (max-width: 767px) {
+            .desktop-sidebar { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="flex min-h-screen" x-data="dashboard()">
+        <!-- Desktop Sidebar -->
+        <aside class="desktop-sidebar flex-col w-60 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed top-0 left-0 h-full z-30" style="display:none;">
+            <div class="p-5">
+                <h1 class="text-xl font-bold text-green-600">Calo</h1>
+                <p class="text-xs text-gray-400 mt-1">热量管理，轻松减重</p>
+            </div>
+            <nav class="flex-1 px-3 space-y-0.5">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    首页
+                </a>
+                <a href="{{ route('meals.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    记录饮食
+                </a>
+                <a href="{{ route('exercises.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    记录运动
+                </a>
+                <a href="{{ route('weights.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                    记录体重
+                </a>
+                <div class="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+                    <a href="{{ route('foods.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        食物库
+                    </a>
+                    <a href="{{ route('content.recipes') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        食谱
+                    </a>
+                    <a href="{{ route('content.trainingPlans') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        训练计划
+                    </a>
+                    <a href="{{ route('reports.history') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        报表
+                    </a>
+                    <a href="{{ route('achievements.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        成就
+                    </a>
+                </div>
+            </nav>
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    我的
+                </a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        退出登录
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">
+        <!-- Mobile Header -->
+        <div class="mobile-header-bar bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 md:hidden">
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div>
+                    <h1 class="text-lg font-semibold dark:text-white">Calo</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ now()->format('Y年m月d日 l') }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button @click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light')" class="text-gray-500 dark:text-gray-400">
+                        <svg x-show="!dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        <svg x-show="dark" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </button>
+                    <div class="text-right">
+                        <p class="text-sm font-medium dark:text-white">{{ $user->name }}</p>
+                        @if($streak > 0)
+                            <p class="text-xs text-orange-500">🔥 连续{{ $streak }}天</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Desktop Header -->
+        <div class="hidden md:block bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h1 class="text-xl font-bold dark:text-white">首页</h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ now()->format('Y年m月d日 l') }} · {{ $user->name }}@if($streak > 0) · 🔥 连续{{ $streak }}天记录@endif</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button @click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light')" class="text-gray-500 dark:text-gray-400 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg x-show="!dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        <svg x-show="dark" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @if(session('success'))
+            <div class="mx-4 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <!-- Calorie Budget Card -->
+        <div class="px-4 mt-4 md:px-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
+                <div class="flex items-center justify-center mb-4">
+                    <!-- Progress Ring -->
+                    <div class="relative">
+                        <svg class="progress-ring w-40 h-40">
+                            <circle cx="80" cy="80" r="70" stroke="#e5e7eb" stroke-width="8" fill="none"/>
+                            <circle cx="80" cy="80" r="70"
+                                    :stroke="progressColor"
+                                    stroke-width="8" fill="none"
+                                    stroke-linecap="round"
+                                    class="progress-ring-circle"
+                                    :stroke-dasharray="439.82"
+                                    :stroke-dashoffset="progressOffset"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <div class="text-3xl font-bold" :class="statusTextClass">
+                                <span x-text="remaining"></span>
+                            </div>
+                            <div class="text-xs text-gray-500">剩余 kcal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Budget Info -->
+                <div class="grid grid-cols-3 gap-4 text-center mt-4">
+                    <div>
+                        <div class="text-lg font-bold text-gray-800" x-text="budget || '-'"></div>
+                        <div class="text-xs text-gray-500">预算</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-orange-500" x-text="intake"></div>
+                        <div class="text-xs text-gray-500">已摄入</div>
+                    </div>
+                    <div>
+                        <div class="text-lg font-bold text-blue-500" x-text="burned"></div>
+                        <div class="text-xs text-gray-500">已消耗</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two-column layout on desktop -->
+        <div class="md:grid md:grid-cols-2 md:gap-6 md:px-6 md:mt-4">
+        <!-- Nutrition Progress -->
+        <div class="px-4 mt-4 md:px-0 md:mt-0">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">营养素摄入</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-600">蛋白质</span>
+                            <span class="text-gray-500" x-text="protein + 'g'"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full transition-all duration-500" :style="'width:' + Math.min(100, proteinPercent) + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-600">碳水</span>
+                            <span class="text-gray-500" x-text="carbs + 'g'"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full transition-all duration-500" :style="'width:' + Math.min(100, carbsPercent) + '%'"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-600">脂肪</span>
+                            <span class="text-gray-500" x-text="fat + 'g'"></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full transition-all duration-500" :style="'width:' + Math.min(100, fatPercent) + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="px-4 mt-4 md:px-0 md:mt-0">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">快捷操作</h3>
+                <div class="grid grid-cols-3 gap-3">
+                <a href="{{ route('meals.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录饮食</div>
+                </a>
+                <a href="{{ route('exercises.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录运动</div>
+                </a>
+                <a href="{{ route('weights.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                        </svg>
+                    </div>
+                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录体重</div>
+                </a>
+                </div>
+            </div>
+        </div>
+        </div> <!-- close md:grid -->
+
+        <!-- Recent Weight & Today's Meals -->
+        <div class="md:grid md:grid-cols-2 md:gap-6 md:px-6 md:mt-4">
+        @if($recentWeight)
+        <div class="px-4 mt-4 md:px-0 md:mt-0">
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="text-sm font-medium text-gray-700">最近体重</div>
+                        <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($recentWeight['date'])->format('m/d') }}</div>
+                    </div>
+                    <div class="text-xl font-bold text-blue-600">
+                        {{ $user->unit_preference === 'jin' ? number_format($recentWeight['weight_kg'] * 2, 1) . ' 斤' : number_format($recentWeight['weight_kg'], 1) . ' kg' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <!-- Today's Meals -->
+        <div class="px-4 mt-4 md:px-0 md:mt-0 mb-4 md:mb-0">
+            <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-medium text-gray-700">今日饮食</h3>
+                    <a href="{{ route('meals.create') }}" class="text-xs text-blue-500">+ 添加</a>
+                </div>
+                @if(isset($today['by_meal']) && count($today['by_meal']) > 0)
+                    <div class="space-y-2">
+                        @foreach(['breakfast' => '早餐', 'lunch' => '午餐', 'dinner' => '晚餐', 'snack' => '加餐'] as $type => $label)
+                            @if(isset($today['by_meal'][$type]))
+                            <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                                <span class="text-sm text-gray-600">{{ $label }}</span>
+                                <span class="text-sm font-medium">{{ $today['by_meal'][$type]['calories'] }} kcal</span>
+                            </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4 text-gray-400 text-sm">今天还没有饮食记录</div>
+                @endif
+            </div>
+        </div>
+        </div> <!-- close md:grid -->
+
+        <!-- Mobile Bottom Nav -->
+        <div class="mobile-bottom-nav fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20 md:hidden">
+            <div class="flex justify-around py-2">
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center px-3 py-1 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    <span class="text-xs mt-0.5">首页</span>
+                </a>
+                <a href="{{ route('meals.create') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span class="text-xs mt-0.5">记录</span>
+                </a>
+                <a href="{{ route('profile.edit') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <span class="text-xs mt-0.5">我的</span>
+                </a>
+            </div>
+        </div>
+        </div> <!-- close main content wrapper -->
+
+    <script>
+        function dashboard() {
+            return {
+                budget: @json($today['budget']),
+                intake: @json($today['intake_calories']),
+                burned: @json($today['burned_calories']),
+                remaining: @json($today['remaining']),
+                protein: @json($today['intake_protein']),
+                carbs: @json($today['intake_carbs']),
+                fat: @json($today['intake_fat']),
+                status: @json($today['status']),
+                showOnboarding: @json($showOnboarding ?? false),
+                onboardingStep: 0,
+                onboardingSteps: [
+                    { title: '首页看板', desc: '查看今日热量预算和摄入进度', target: 'progress-ring' },
+                    { title: '饮食记录', desc: '点击"记录饮食"添加每餐饮食', target: 'btn-meal' },
+                    { title: '运动记录', desc: '点击"记录运动"追踪运动消耗', target: 'btn-exercise' },
+                    { title: '体重记录', desc: '点击"记录体重"追踪体重变化', target: 'btn-weight' },
+                ],
+
+                nextOnboardingStep() {
+                    if (this.onboardingStep < this.onboardingSteps.length - 1) {
+                        this.onboardingStep++;
+                    } else {
+                        this.completeOnboarding();
+                    }
+                },
+
+                async completeOnboarding() {
+                    this.showOnboarding = false;
+                    await fetch('{{ route("onboarding.complete") }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    });
+                },
+
+                async skipOnboarding() {
+                    this.showOnboarding = false;
+                    await fetch('{{ route("onboarding.skip") }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    });
+                },
+
+                get proteinPercent() { return this.budget ? (this.protein / (this.budget * 0.3 / 4) * 100) : 0; },
+                get carbsPercent() { return this.budget ? (this.carbs / (this.budget * 0.5 / 4) * 100) : 0; },
+                get fatPercent() { return this.budget ? (this.fat / (this.budget * 0.2 / 9) * 100) : 0; },
+
+                get progressOffset() {
+                    if (!this.budget || this.budget <= 0) return 439.82;
+                    const pct = Math.min(1, this.intake / this.budget);
+                    return 439.82 * (1 - pct);
+                },
+
+                get progressColor() {
+                    if (this.status === 'over') return '#ef4444';
+                    if (this.status === 'warning') return '#f59e0b';
+                    return '#22c55e';
+                },
+
+                get statusTextClass() {
+                    if (this.status === 'over') return 'text-red-500';
+                    if (this.status === 'warning') return 'text-yellow-500';
+                    return 'text-green-500';
+                }
+            }
+        }
+    </script>
+
+    <!-- Onboarding Overlay -->
+    <div x-show="showOnboarding" x-cloak class="fixed inset-0 z-50" style="max-width: 430px; margin: 0 auto;">
+        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="relative h-full flex flex-col items-center justify-center px-8">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-2xl" x-text="['📊','🍽️','💪','⚖️'][onboardingStep]"></span>
+                </div>
+                <h3 class="text-lg font-semibold mb-2" x-text="onboardingSteps[onboardingStep].title"></h3>
+                <p class="text-sm text-gray-600 mb-6" x-text="onboardingSteps[onboardingStep].desc"></p>
+
+                <!-- Step indicators -->
+                <div class="flex justify-center gap-2 mb-6">
+                    <template x-for="(step, i) in onboardingSteps" :key="i">
+                        <div class="w-2 h-2 rounded-full transition-colors" :class="i <= onboardingStep ? 'bg-blue-500' : 'bg-gray-300'"></div>
+                    </template>
+                </div>
+
+                <div class="space-y-2">
+                    <button @click="nextOnboardingStep()" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" x-text="onboardingStep < onboardingSteps.length - 1 ? '下一步' : '开始使用'"></button>
+                    <button @click="skipOnboarding()" class="w-full py-2 text-gray-500 text-sm hover:text-gray-700 transition-colors">跳过引导</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div> <!-- close root flex -->
+</body>
+</html>
