@@ -43,20 +43,18 @@
 
         <!-- Search History (stored in localStorage via Alpine.js) -->
         @if(empty($query))
-            <div class="px-4 mt-4" x-data="searchHistory()">
-                @if(histories.length > 0)
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="text-sm font-medium text-gray-500">搜索历史</h3>
-                        <button @click="clearHistory()" class="text-xs text-gray-400">清空</button>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <template x-for="h in histories" :key="h">
-                            <a :href="'{{ route("foods.search") }}?q=' + encodeURIComponent(h)"
-                               class="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50"
-                               x-text="h"></a>
-                        </template>
-                    </div>
-                @endif
+            <div class="px-4 mt-4" x-data="searchHistory()" x-show="histories.length > 0">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-gray-500">搜索历史</h3>
+                    <button @click="clearHistory()" class="text-xs text-gray-400">清空</button>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="h in histories" :key="h">
+                        <a :href="'{{ route("foods.search") }}?q=' + encodeURIComponent(h)"
+                           class="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50"
+                           x-text="h"></a>
+                    </template>
+                </div>
             </div>
         @endif
 
