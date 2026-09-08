@@ -144,10 +144,10 @@ class GenerateFoodData extends Command
             'name' => $food['name'],
             'aliases' => !empty($food['aliases']) ? json_encode($food['aliases'], JSON_UNESCAPED_UNICODE) : null,
             'category' => $food['category'],
-            'calories_per_100g' => $food['cal'],
-            'protein_per_100g' => $food['protein'],
-            'carbs_per_100g' => $food['carbs'],
-            'fat_per_100g' => $food['fat'],
+            'calories_per_100g' => max(0, $food['cal']),
+            'protein_per_100g' => max(0, $food['protein']),
+            'carbs_per_100g' => max(0, $food['carbs']),
+            'fat_per_100g' => max(0, $food['fat']),
             'serving_size' => $food['serving_size'] ?? 100,
             'serving_unit' => $food['serving_unit'] ?? 'g',
             'source' => 'crawled',
@@ -301,16 +301,24 @@ class GenerateFoodData extends Command
                 ['name' => '膨化食品', 'cal' => 450, 'protein' => 5.5, 'carbs' => 65.2, 'fat' => 18.5, 'units' => ['虾条', '虾片', '锅巴', '米饼', '雪饼', '仙贝', '铜锣烧', '铜锣烧', '玉米棒', '芝士条']],
             ],
             '饮料' => [
-                ['name' => '可乐', 'cal' => 43, 'protein' => 0.1, 'carbs' => 10.8, 'fat' => 0, 'units' => ['原味', '零度', '纤维', '香草', '生姜', '樱桃', '柠檬']],
+                ['name' => '可乐', 'cal' => 42, 'protein' => 0, 'carbs' => 10.6, 'fat' => 0, 'units' => ['原味', '零度', '纤维', '香草', '生姜', '樱桃', '柠檬']],
                 ['name' => '果汁', 'cal' => 45, 'protein' => 0.3, 'carbs' => 10.5, 'fat' => 0.1, 'units' => ['橙汁', '苹果汁', '葡萄汁', '西瓜汁', '芒果汁', '桃汁', '梨汁', '混合果汁', '番茄汁', '蓝莓汁']],
                 ['name' => '奶茶', 'cal' => 65, 'protein' => 1.2, 'carbs' => 12.5, 'fat' => 1.8, 'units' => ['珍珠', '椰果', '芋圆', '红豆', '布丁', '仙草', '奶盖', '芝士', '黑糖', '茉莉']],
-                ['name' => '咖啡', 'cal' => 8, 'protein' => 0.3, 'carbs' => 0.8, 'fat' => 0.2, 'units' => ['美式', '拿铁', '卡布奇诺', '摩卡', '浓缩', '冷萃', '冰美式', '焦糖玛奇朵', '澳白', '手冲']],
-                ['name' => '牛奶', 'cal' => 54, 'protein' => 3.0, 'carbs' => 4.8, 'fat' => 3.2, 'units' => ['全脂', '脱脂', '低脂', '高钙', '有机', 'A2', '舒化', '水牛奶', '羊奶', '燕麦奶']],
-                ['name' => '酸奶', 'cal' => 72, 'protein' => 3.5, 'carbs' => 9.8, 'fat' => 2.8, 'units' => ['原味', '草莓', '蓝莓', '黄桃', '红枣', '炭烧', '希腊', '0蔗糖', '益生菌', '老酸奶']],
+                ['name' => '咖啡(黑)', 'cal' => 2, 'protein' => 0.1, 'carbs' => 0, 'fat' => 0, 'units' => ['美式', '冷萃', '冰美式', '手冲', '浓缩']],
+                ['name' => '咖啡(奶)', 'cal' => 120, 'protein' => 5.5, 'carbs' => 10.5, 'fat' => 6.0, 'units' => ['拿铁', '卡布奇诺', '澳白']],
+                ['name' => '咖啡(摩卡)', 'cal' => 170, 'protein' => 5.0, 'carbs' => 21.0, 'fat' => 7.5, 'units' => ['摩卡', '焦糖玛奇朵']],
+                ['name' => '牛奶(全脂)', 'cal' => 61, 'protein' => 3.2, 'carbs' => 4.7, 'fat' => 3.4, 'units' => ['全脂', '高钙', '有机', 'A2', '舒化', '水牛奶', '羊奶']],
+                ['name' => '牛奶(脱脂)', 'cal' => 34, 'protein' => 3.4, 'carbs' => 5.0, 'fat' => 0.1, 'units' => ['脱脂', '低脂']],
+                ['name' => '燕麦奶', 'cal' => 45, 'protein' => 1.0, 'carbs' => 7.5, 'fat' => 1.5, 'units' => ['燕麦奶']],
+                ['name' => '酸奶(原味)', 'cal' => 72, 'protein' => 3.5, 'carbs' => 9.8, 'fat' => 2.8, 'units' => ['原味', '炭烧', '希腊', '0蔗糖', '益生菌', '老酸奶']],
+                ['name' => '酸奶(果味)', 'cal' => 97, 'protein' => 2.8, 'carbs' => 15.2, 'fat' => 2.5, 'units' => ['草莓', '蓝莓', '黄桃', '红枣']],
                 ['name' => '豆浆', 'cal' => 31, 'protein' => 2.8, 'carbs' => 1.8, 'fat' => 1.5, 'units' => ['原味', '甜味', '五谷', '黑豆', '红豆', '花生', '核桃', '红枣', '燕麦', '芝麻']],
-                ['name' => '茶饮料', 'cal' => 18, 'protein' => 0.1, 'carbs' => 4.2, 'fat' => 0, 'units' => ['绿茶', '红茶', '乌龙茶', '茉莉花茶', '冰红茶', '柠檬茶', '奶茶', '普洱', '铁观音', '龙井']],
+                ['name' => '茶饮料(无糖)', 'cal' => 1, 'protein' => 0, 'carbs' => 0, 'fat' => 0, 'units' => ['绿茶', '红茶', '乌龙茶', '茉莉花茶', '普洱', '铁观音', '龙井']],
+                ['name' => '冰红茶', 'cal' => 40, 'protein' => 0, 'carbs' => 9.6, 'fat' => 0, 'units' => ['冰红茶', '柠檬茶']],
+                ['name' => '奶茶(瓶装)', 'cal' => 52, 'protein' => 0.6, 'carbs' => 10.8, 'fat' => 1.0, 'units' => ['奶茶']],
                 ['name' => '运动饮料', 'cal' => 26, 'protein' => 0, 'carbs' => 6.5, 'fat' => 0, 'units' => ['佳得乐', '宝矿力', '尖叫', '力量帝', '体饮', '维体', '电解质']],
-                ['name' => '气泡水', 'cal' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0, 'units' => ['原味', '柠檬', '青柠', '西柚', '百香果', '桃子', '荔枝', '玫瑰']],
+                ['name' => '气泡水(无糖)', 'cal' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0, 'units' => ['原味', '柠檬', '青柠', '西柚', '百香果', '桃子', '荔枝', '玫瑰']],
+                ['name' => '功能饮料', 'cal' => 45, 'protein' => 0.5, 'carbs' => 11.0, 'fat' => 0, 'units' => ['红牛', '东鹏特饮', '乐虎', '体质能量']],
             ],
             '调味品' => [
                 ['name' => '酱油', 'cal' => 53, 'protein' => 5.6, 'carbs' => 5.8, 'fat' => 0.1, 'units' => ['生抽', '老抽', '味极鲜', '蒸鱼豉油', '日式', '减盐', '有机']],
@@ -363,9 +371,9 @@ class GenerateFoodData extends Command
                 $items[] = $this->buildRow([
                     'name' => "{$variant}{$drink['name']}",
                     'category' => $drink['category'],
-                    'cal' => $drink['cal'] + rand(-10, 10),
+                    'cal' => $drink['cal'] + rand(-3, 3),
                     'protein' => $drink['protein'],
-                    'carbs' => $drink['carbs'] + rand(-20, 20) / 10,
+                    'carbs' => round($drink['carbs'] + rand(-3, 3) / 10, 1),
                     'fat' => $drink['fat'],
                 ]);
             }
@@ -958,29 +966,52 @@ class GenerateFoodData extends Command
         $teaTypes = ['绿茶', '红茶', '乌龙茶', '茉莉花茶', '普洱茶', '白茶', '玄米茶', '大麦茶', '桂花茶', '柠檬茶'];
         foreach ($teaBrands as $brand) {
             foreach (array_slice($teaTypes, 0, 6) as $tea) {
+                $cal = match(true) {
+                    str_contains($tea, '绿茶') || str_contains($tea, '白茶') || str_contains($tea, '玄米') || str_contains($tea, '大麦') => 1,
+                    str_contains($tea, '红茶') || str_contains($tea, '乌龙') || str_contains($tea, '茉莉') || str_contains($tea, '普洱') || str_contains($tea, '桂花') => 1,
+                    str_contains($tea, '柠檬') => 30,
+                    default => 1,
+                };
+                $carbs = match(true) {
+                    str_contains($tea, '绿茶') || str_contains($tea, '白茶') || str_contains($tea, '玄米') || str_contains($tea, '大麦') => 0,
+                    str_contains($tea, '红茶') || str_contains($tea, '乌龙') || str_contains($tea, '茉莉') || str_contains($tea, '普洱') || str_contains($tea, '桂花') => 0,
+                    str_contains($tea, '柠檬') => 7.2,
+                    default => 0,
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$tea}",
                     'category' => '饮料',
-                    'cal' => 5 + rand(0, 25),
-                    'protein' => 0.1,
-                    'carbs' => 1 + rand(0, 5),
+                    'cal' => $cal,
+                    'protein' => 0,
+                    'carbs' => $carbs,
                     'fat' => 0,
                 ]);
             }
         }
 
-        // More coffee drinks
+        // More coffee drinks - type-specific values
         $coffeeBrands = ['星巴克', '瑞幸', 'Manner', 'Seesaw', 'M Stand', 'Tims', 'costa', '太平洋', '蓝瓶', 'illy'];
         $coffeeTypes = ['美式', '拿铁', '卡布奇诺', '摩卡', '澳白', '冷萃', '手冲', '冰博克', '生椰拿铁', '燕麦拿铁'];
         foreach ($coffeeBrands as $brand) {
             foreach (array_slice($coffeeTypes, 0, 6) as $coffee) {
+                $base = match(true) {
+                    str_contains($coffee, '美式') || str_contains($coffee, '冷萃') || str_contains($coffee, '手冲') => ['cal' => 4, 'protein' => 0.2, 'carbs' => 0, 'fat' => 0],
+                    str_contains($coffee, '拿铁') && !str_contains($coffee, '生椰') && !str_contains($coffee, '燕麦') => ['cal' => 135, 'protein' => 6.5, 'carbs' => 13.5, 'fat' => 6.8],
+                    str_contains($coffee, '生椰') => ['cal' => 125, 'protein' => 4.5, 'carbs' => 15.8, 'fat' => 5.2],
+                    str_contains($coffee, '燕麦') => ['cal' => 120, 'protein' => 3.5, 'carbs' => 16.0, 'fat' => 4.5],
+                    str_contains($coffee, '卡布') => ['cal' => 90, 'protein' => 4.5, 'carbs' => 7.5, 'fat' => 5.0],
+                    str_contains($coffee, '摩卡') => ['cal' => 180, 'protein' => 5.5, 'carbs' => 22.0, 'fat' => 8.5],
+                    str_contains($coffee, '澳白') => ['cal' => 110, 'protein' => 5.0, 'carbs' => 10.0, 'fat' => 5.5],
+                    str_contains($coffee, '冰博克') => ['cal' => 160, 'protein' => 8.0, 'carbs' => 14.0, 'fat' => 8.0],
+                    default => ['cal' => 50, 'protein' => 2.0, 'carbs' => 5.0, 'fat' => 2.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$coffee}",
                     'category' => '饮料',
-                    'cal' => 8 + rand(0, 180),
-                    'protein' => 0.5 + rand(0, 50) / 10,
-                    'carbs' => 1 + rand(0, 35),
-                    'fat' => 0.1 + rand(0, 10) / 10,
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1104,19 +1135,27 @@ class GenerateFoodData extends Command
             }
         }
 
-        // More fruit varieties × preparations
+        // More fruit varieties × preparations - fruit base data
         $fruits = ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓', '蓝莓', '芒果', '猕猴桃', '桃子', '梨', '樱桃', '荔枝', '龙眼', '榴莲', '火龙果', '柚子', '山竹', '木瓜', '柿子', '石榴', '百香果', '杨梅', '枇杷', '桑葚', '椰子', '菠萝', '柠檬', '杨桃', '番石榴', '山楂', '杏', '李子', '枣'];
         $fruitPreps = ['鲜切', '冰镇', '榨汁', '果干', '果酱', '罐头', '沙拉', '冰沙', '奶昔', '果茶', '蜜饯', '冻干'];
 
         foreach ($fruits as $fruit) {
             foreach (array_slice($fruitPreps, 0, 6) as $prep) {
+                $base = match(true) {
+                    str_contains($prep, '鲜切') || str_contains($prep, '冰镇') || str_contains($prep, '沙拉') => ['cal' => 50, 'protein' => 0.5, 'carbs' => 12.0, 'fat' => 0.2],
+                    str_contains($prep, '榨汁') || str_contains($prep, '果茶') => ['cal' => 45, 'protein' => 0.3, 'carbs' => 10.5, 'fat' => 0.1],
+                    str_contains($prep, '果干') || str_contains($prep, '蜜饯') || str_contains($prep, '冻干') => ['cal' => 330, 'protein' => 2.0, 'carbs' => 80.0, 'fat' => 1.0],
+                    str_contains($prep, '果酱') || str_contains($prep, '罐头') => ['cal' => 250, 'protein' => 0.5, 'carbs' => 62.0, 'fat' => 0.5],
+                    str_contains($prep, '冰沙') || str_contains($prep, '奶昔') => ['cal' => 70, 'protein' => 1.0, 'carbs' => 16.0, 'fat' => 0.5],
+                    default => ['cal' => 50, 'protein' => 0.5, 'carbs' => 12.0, 'fat' => 0.2],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$prep}{$fruit}",
                     'category' => '水果',
-                    'cal' => 30 + rand(0, 120),
-                    'protein' => 0.3 + rand(0, 30) / 10,
-                    'carbs' => 5 + rand(0, 25),
-                    'fat' => 0.1 + rand(0, 10) / 10,
+                    'cal' => $base['cal'] + rand(-3, 3),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1137,18 +1176,25 @@ class GenerateFoodData extends Command
             }
         }
 
-        // Traditional Chinese medicine foods / health foods
+        // Traditional Chinese medicine foods / health foods - type-specific values
         $healthFoods = ['红枣', '枸杞', '桂圆', '莲子', '百合', '银耳', '燕窝', '阿胶', '蜂蜜', '黑芝麻', '核桃', '花生', '薏米', '红豆', '绿豆', '黄豆', '黑豆', '芡实', '茯苓', '山药'];
         $healthPreps = ['煮粥', '煲汤', '泡水', '炖品', '糕点', '丸子', '粉', '膏', '茶', '酒'];
         foreach ($healthFoods as $food) {
             foreach (array_slice($healthPreps, 0, 8) as $prep) {
+                $base = match(true) {
+                    str_contains($prep, '煮粥') || str_contains($prep, '煲汤') || str_contains($prep, '泡水') || str_contains($prep, '茶') => ['cal' => 45, 'protein' => 1.5, 'carbs' => 9.0, 'fat' => 0.5],
+                    str_contains($prep, '炖品') || str_contains($prep, '酒') => ['cal' => 120, 'protein' => 3.0, 'carbs' => 15.0, 'fat' => 4.0],
+                    str_contains($prep, '糕点') || str_contains($prep, '丸子') => ['cal' => 350, 'protein' => 8.0, 'carbs' => 50.0, 'fat' => 12.0],
+                    str_contains($prep, '粉') || str_contains($prep, '膏') => ['cal' => 300, 'protein' => 5.0, 'carbs' => 55.0, 'fat' => 8.0],
+                    default => ['cal' => 100, 'protein' => 3.0, 'carbs' => 18.0, 'fat' => 2.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$food}{$prep}",
                     'category' => '其他',
-                    'cal' => 50 + rand(0, 180),
-                    'protein' => 2 + rand(0, 8),
-                    'carbs' => 8 + rand(0, 25),
-                    'fat' => 1 + rand(0, 8),
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1293,29 +1339,42 @@ class GenerateFoodData extends Command
         $moreTeaTypes = ['绿茶', '红茶', '乌龙茶', '茉莉花茶', '普洱茶', '白茶', '玄米茶', '大麦茶', '桂花茶', '柠檬茶'];
         foreach ($moreTeaBrands as $brand) {
             foreach (array_slice($moreTeaTypes, 0, 8) as $tea) {
+                $cal = str_contains($tea, '柠檬') ? 30 : 1;
+                $carbs = str_contains($tea, '柠檬') ? 7.2 : 0;
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$tea}",
                     'category' => '饮料',
-                    'cal' => 5 + rand(0, 25),
-                    'protein' => 0.1,
-                    'carbs' => 1 + rand(0, 5),
+                    'cal' => $cal,
+                    'protein' => 0,
+                    'carbs' => $carbs,
                     'fat' => 0,
                 ]);
             }
         }
 
-        // More coffee brands × types
+        // More coffee brands × types - type-specific values
         $moreCoffeeBrands = ['星巴克', '瑞幸', 'Manner', 'Seesaw', 'M Stand', 'Tims', 'costa', '太平洋', '蓝瓶', 'illy', '雀巢', 'UCC', '隅田川', '三顿半', '永璞'];
         $moreCoffeeTypes = ['美式', '拿铁', '卡布奇诺', '摩卡', '澳白', '冷萃', '手冲', '冰博克', '生椰拿铁', '燕麦拿铁'];
         foreach ($moreCoffeeBrands as $brand) {
             foreach (array_slice($moreCoffeeTypes, 0, 8) as $coffee) {
+                $base = match(true) {
+                    str_contains($coffee, '美式') || str_contains($coffee, '冷萃') || str_contains($coffee, '手冲') => ['cal' => 4, 'protein' => 0.2, 'carbs' => 0, 'fat' => 0],
+                    str_contains($coffee, '拿铁') && !str_contains($coffee, '生椰') && !str_contains($coffee, '燕麦') => ['cal' => 135, 'protein' => 6.5, 'carbs' => 13.5, 'fat' => 6.8],
+                    str_contains($coffee, '生椰') => ['cal' => 125, 'protein' => 4.5, 'carbs' => 15.8, 'fat' => 5.2],
+                    str_contains($coffee, '燕麦') => ['cal' => 120, 'protein' => 3.5, 'carbs' => 16.0, 'fat' => 4.5],
+                    str_contains($coffee, '卡布') => ['cal' => 90, 'protein' => 4.5, 'carbs' => 7.5, 'fat' => 5.0],
+                    str_contains($coffee, '摩卡') => ['cal' => 180, 'protein' => 5.5, 'carbs' => 22.0, 'fat' => 8.5],
+                    str_contains($coffee, '澳白') => ['cal' => 110, 'protein' => 5.0, 'carbs' => 10.0, 'fat' => 5.5],
+                    str_contains($coffee, '冰博克') => ['cal' => 160, 'protein' => 8.0, 'carbs' => 14.0, 'fat' => 8.0],
+                    default => ['cal' => 50, 'protein' => 2.0, 'carbs' => 5.0, 'fat' => 2.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$coffee}",
                     'category' => '饮料',
-                    'cal' => 8 + rand(0, 180),
-                    'protein' => 0.5 + rand(0, 50) / 10,
-                    'carbs' => 1 + rand(0, 35),
-                    'fat' => 0.1 + rand(0, 10) / 10,
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1384,34 +1443,58 @@ class GenerateFoodData extends Command
             }
         }
 
-        // More condiment brands × types
+        // More condiment brands × types - type-specific values
         $condimentBrands = ['海天', '李锦记', '千禾', '厨邦', '加加', '恒顺', '鲁花', '金龙鱼', '福临门', '胡姬花'];
         $condimentTypes = ['生抽', '老抽', '蚝油', '醋', '料酒', '豆瓣酱', '番茄酱', '辣椒酱', '芝麻酱', '甜面酱', '沙茶酱', 'XO酱', '海鲜酱', '柱候酱', '南乳'];
         foreach ($condimentBrands as $brand) {
             foreach (array_slice($condimentTypes, 0, 10) as $cond) {
+                $base = match(true) {
+                    str_contains($cond, '生抽') || str_contains($cond, '老抽') => ['cal' => 53, 'protein' => 5.6, 'carbs' => 5.4, 'fat' => 0.1],
+                    str_contains($cond, '蚝油') => ['cal' => 132, 'protein' => 3.5, 'carbs' => 25.0, 'fat' => 0.9],
+                    str_contains($cond, '醋') => ['cal' => 31, 'protein' => 0.4, 'carbs' => 4.9, 'fat' => 0.1],
+                    str_contains($cond, '料酒') => ['cal' => 62, 'protein' => 0.3, 'carbs' => 5.5, 'fat' => 0],
+                    str_contains($cond, '豆瓣酱') => ['cal' => 178, 'protein' => 9.5, 'carbs' => 16.8, 'fat' => 8.2],
+                    str_contains($cond, '番茄酱') => ['cal' => 82, 'protein' => 1.2, 'carbs' => 18.9, 'fat' => 0.2],
+                    str_contains($cond, '辣椒酱') => ['cal' => 89, 'protein' => 2.0, 'carbs' => 16.5, 'fat' => 1.8],
+                    str_contains($cond, '芝麻酱') => ['cal' => 586, 'protein' => 17.3, 'carbs' => 21.2, 'fat' => 49.5],
+                    str_contains($cond, '甜面酱') => ['cal' => 133, 'protein' => 5.5, 'carbs' => 25.8, 'fat' => 1.6],
+                    str_contains($cond, '沙茶') || str_contains($cond, 'XO') || str_contains($cond, '海鲜') || str_contains($cond, '柱候') => ['cal' => 200, 'protein' => 6.0, 'carbs' => 18.0, 'fat' => 12.0],
+                    str_contains($cond, '南乳') => ['cal' => 133, 'protein' => 12.0, 'carbs' => 5.0, 'fat' => 8.0],
+                    default => ['cal' => 100, 'protein' => 3.0, 'carbs' => 12.0, 'fat' => 4.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$cond}",
                     'category' => '调味品',
-                    'cal' => 80 + rand(-30, 50),
-                    'protein' => 2 + rand(0, 5),
-                    'carbs' => 10 + rand(-5, 10),
-                    'fat' => 2 + rand(0, 5),
+                    'cal' => $base['cal'] + rand(-3, 3),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
 
-        // More salad dressing brands × types
+        // More salad dressing brands × types - type-specific values
         $saladBrands = ['丘比', '亨氏', '味好美', '百利', '日食记', '李子柒', '海底捞', '好利来', '味多美', '家乐'];
         $saladTypes = ['千岛酱', '凯撒酱', '蜂蜜芥末酱', '油醋汁', '芝麻酱', '蛋黄酱', ' ranch', '甜辣酱', '柚子醋', '柠檬汁'];
         foreach ($saladBrands as $brand) {
             foreach (array_slice($saladTypes, 0, 6) as $salad) {
+                $base = match(true) {
+                    str_contains($salad, '油醋') || str_contains($salad, '柚子') || str_contains($salad, '柠檬') => ['cal' => 120, 'protein' => 0.5, 'carbs' => 8.0, 'fat' => 10.0],
+                    str_contains($salad, '蛋黄') || str_contains($salad, 'ranch') => ['cal' => 680, 'protein' => 1.0, 'carbs' => 3.0, 'fat' => 75.0],
+                    str_contains($salad, '千岛') => ['cal' => 475, 'protein' => 1.2, 'carbs' => 28.0, 'fat' => 40.0],
+                    str_contains($salad, '凯撒') => ['cal' => 320, 'protein' => 2.0, 'carbs' => 6.0, 'fat' => 32.0],
+                    str_contains($salad, '蜂蜜芥末') => ['cal' => 280, 'protein' => 1.0, 'carbs' => 20.0, 'fat' => 22.0],
+                    str_contains($salad, '芝麻') => ['cal' => 580, 'protein' => 3.0, 'carbs' => 10.0, 'fat' => 55.0],
+                    str_contains($salad, '甜辣') => ['cal' => 180, 'protein' => 1.0, 'carbs' => 35.0, 'fat' => 5.0],
+                    default => ['cal' => 250, 'protein' => 1.0, 'carbs' => 15.0, 'fat' => 20.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$salad}",
                     'category' => '调味品',
-                    'cal' => 350 + rand(-50, 100),
-                    'protein' => 1 + rand(0, 2),
-                    'carbs' => 5 + rand(-2, 5),
-                    'fat' => 35 + rand(-10, 10),
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-1, 1) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1584,51 +1667,141 @@ class GenerateFoodData extends Command
 
         foreach ($brands as $brand => $products) {
             foreach ($products as $product) {
+                // Determine category and base nutrition values based on product type
+                $category = match(true) {
+                    str_contains($product, '奶') && !str_contains($product, '果') || str_contains($product, '酸奶') => '蛋奶',
+                    str_contains($product, '茶') || str_contains($product, '水') || str_contains($product, '汁') || str_contains($product, '可乐') || str_contains($product, '咖啡') || str_contains($product, '凉茶') => '饮料',
+                    str_contains($product, '面') => '主食',
+                    str_contains($product, '蛋糕') || str_contains($product, '面包') || str_contains($product, '饼干') || str_contains($product, '曲奇') || str_contains($product, '蛋') || str_contains($product, '桃酥') || str_contains($product, '月饼') || str_contains($product, '麻薯') || str_contains($product, '泡芙') || str_contains($product, '甜品') || str_contains($product, '绿豆糕') || str_contains($product, '糕') || str_contains($product, '拿破仑') || str_contains($product, '慕斯') || str_contains($product, '芝士') => '零食',
+                    default => '其他',
+                };
+
+                $base = match(true) {
+                    // Milk products
+                    str_contains($product, '脱脂') || str_contains($product, '低脂') => ['cal' => 36, 'protein' => 3.4, 'carbs' => 5.0, 'fat' => 0.5],
+                    str_contains($product, '纯牛奶') || str_contains($product, '高钙') || str_contains($product, '有机') || str_contains($product, '舒化') => ['cal' => 61, 'protein' => 3.2, 'carbs' => 4.7, 'fat' => 3.4],
+                    str_contains($product, '早餐奶') || str_contains($product, '营养奶') || str_contains($product, '真果粒') => ['cal' => 85, 'protein' => 2.5, 'carbs' => 14.0, 'fat' => 2.5],
+                    str_contains($product, '莫斯利安') || str_contains($product, '酸牛奶') => ['cal' => 97, 'protein' => 2.8, 'carbs' => 15.2, 'fat' => 2.5],
+                    str_contains($product, 'AD钙') || str_contains($product, '爽歪歪') => ['cal' => 55, 'protein' => 2.0, 'carbs' => 10.0, 'fat' => 1.2],
+                    str_contains($product, '营养快线') => ['cal' => 68, 'protein' => 2.5, 'carbs' => 12.0, 'fat' => 1.5],
+                    // Beverages - Water (0 cal)
+                    str_contains($product, '纯净水') || str_contains($product, '矿泉水') || str_contains($product, '冰露') || str_contains($product, '纯水乐') => ['cal' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0],
+                    // Beverages - Cola/Soda
+                    str_contains($product, '可乐') || str_contains($product, '百事') || str_contains($product, '零度') => ['cal' => 42, 'protein' => 0, 'carbs' => 10.6, 'fat' => 0],
+                    str_contains($product, '雪碧') || str_contains($product, '七喜') => ['cal' => 40, 'protein' => 0, 'carbs' => 10.0, 'fat' => 0],
+                    str_contains($product, '芬达') || str_contains($product, '美年达') => ['cal' => 44, 'protein' => 0, 'carbs' => 11.0, 'fat' => 0],
+                    // Beverages - Tea
+                    str_contains($product, '冰红茶') || str_contains($product, '绿茶') && !str_contains($product, '东方') => ['cal' => 40, 'protein' => 0, 'carbs' => 9.6, 'fat' => 0],
+                    str_contains($product, '东方树叶') => ['cal' => 1, 'protein' => 0, 'carbs' => 0, 'fat' => 0],
+                    str_contains($product, '茶π') => ['cal' => 38, 'protein' => 0, 'carbs' => 9.2, 'fat' => 0],
+                    str_contains($product, '阿萨姆') || str_contains($product, '小茗') => ['cal' => 48, 'protein' => 0.2, 'carbs' => 11.5, 'fat' => 0],
+                    str_contains($product, '茉莉花茶') => ['cal' => 35, 'protein' => 0, 'carbs' => 8.5, 'fat' => 0],
+                    // Beverages - Juice
+                    str_contains($product, '橙汁') || str_contains($product, '鲜橙') || str_contains($product, '果橙') || str_contains($product, '橙') => ['cal' => 45, 'protein' => 0.7, 'carbs' => 10.4, 'fat' => 0.2],
+                    str_contains($product, '苹果汁') || str_contains($product, '苹果') => ['cal' => 46, 'protein' => 0.1, 'carbs' => 11.3, 'fat' => 0.1],
+                    str_contains($product, '葡萄汁') || str_contains($product, '葡萄') && str_contains($product, '汁') => ['cal' => 60, 'protein' => 0.4, 'carbs' => 14.6, 'fat' => 0.1],
+                    str_contains($product, '水蜜桃') || str_contains($product, '桃汁') || str_contains($product, '蜜桃') => ['cal' => 45, 'protein' => 0.3, 'carbs' => 10.8, 'fat' => 0.1],
+                    str_contains($product, 'NFC') || str_contains($product, '鲜榨') => ['cal' => 48, 'protein' => 0.5, 'carbs' => 11.2, 'fat' => 0.2],
+                    // Beverages - Sports/Energy
+                    str_contains($product, '佳得乐') || str_contains($product, '尖叫') => ['cal' => 26, 'protein' => 0, 'carbs' => 6.5, 'fat' => 0],
+                    // Beverages - Sparkling water (zero cal)
+                    str_contains($product, '气泡水') && !str_contains($product, '可乐味') => ['cal' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0],
+                    str_contains($product, '可乐味气泡水') => ['cal' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0],
+                    str_contains($product, '燃茶') => ['cal' => 1, 'protein' => 0, 'carbs' => 0, 'fat' => 0],
+                    str_contains($product, '满分') || str_contains($product, '对策') || str_contains($product, '冰箱分') => ['cal' => 45, 'protein' => 0.5, 'carbs' => 11.0, 'fat' => 0],
+                    str_contains($product, '外星人') || str_contains($product, '微气泡') => ['cal' => 26, 'protein' => 0, 'carbs' => 6.5, 'fat' => 0],
+                    // Beverages - Herbal tea
+                    str_contains($product, '凉茶') || str_contains($product, '加多宝') || str_contains($product, '和其正') => ['cal' => 42, 'protein' => 0.1, 'carbs' => 10.5, 'fat' => 0],
+                    // Beverages - Coffee
+                    str_contains($product, '咖啡') => ['cal' => 4, 'protein' => 0.2, 'carbs' => 0, 'fat' => 0],
+                    // Beverages - Misc
+                    str_contains($product, '酸梅汤') || str_contains($product, '蜂蜜柚子') => ['cal' => 45, 'protein' => 0, 'carbs' => 11.0, 'fat' => 0],
+                    str_contains($product, '八宝粥') => ['cal' => 82, 'protein' => 2.3, 'carbs' => 15.4, 'fat' => 1.2],
+                    // Noodles
+                    str_contains($product, '面') => ['cal' => 460, 'protein' => 9.5, 'carbs' => 60.0, 'fat' => 20.0],
+                    // Bakery/snacks
+                    str_contains($product, '芝士') && str_contains($product, '半熟') => ['cal' => 345, 'protein' => 8.0, 'carbs' => 28.0, 'fat' => 22.0],
+                    str_contains($product, '蛋糕') || str_contains($product, '慕斯') => ['cal' => 320, 'protein' => 6.5, 'carbs' => 46.0, 'fat' => 12.5],
+                    str_contains($product, '面包') || str_contains($product, '吐司') => ['cal' => 266, 'protein' => 8.3, 'carbs' => 49.2, 'fat' => 3.3],
+                    str_contains($product, '饼干') || str_contains($product, '曲奇') => ['cal' => 480, 'protein' => 6.5, 'carbs' => 62.0, 'fat' => 22.0],
+                    str_contains($product, '月饼') => ['cal' => 410, 'protein' => 8.0, 'carbs' => 52.0, 'fat' => 20.0],
+                    str_contains($product, '桃酥') || str_contains($product, '蛋黄酥') => ['cal' => 450, 'protein' => 8.0, 'carbs' => 55.0, 'fat' => 23.0],
+                    str_contains($product, '麻薯') => ['cal' => 260, 'protein' => 4.0, 'carbs' => 48.0, 'fat' => 5.0],
+                    str_contains($product, '泡芙') => ['cal' => 285, 'protein' => 5.0, 'carbs' => 32.0, 'fat' => 15.5],
+                    str_contains($product, '拿破仑') || str_contains($product, '肉松小贝') => ['cal' => 420, 'protein' => 8.0, 'carbs' => 45.0, 'fat' => 22.0],
+                    str_contains($product, '巧克力') => ['cal' => 546, 'protein' => 5.5, 'carbs' => 59.4, 'fat' => 31.3],
+                    str_contains($product, '甜品') => ['cal' => 280, 'protein' => 5.0, 'carbs' => 40.0, 'fat' => 12.0],
+                    str_contains($product, '绿豆糕') => ['cal' => 349, 'protein' => 7.0, 'carbs' => 58.0, 'fat' => 10.2],
+                    str_contains($product, '流心') => ['cal' => 380, 'protein' => 7.0, 'carbs' => 50.0, 'fat' => 17.0],
+                    str_contains($product, '蛋挞') => ['cal' => 290, 'protein' => 8.5, 'carbs' => 28.0, 'fat' => 16.5],
+                    default => ['cal' => 200, 'protein' => 5.0, 'carbs' => 30.0, 'fat' => 8.0],
+                };
+
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$product}",
-                    'category' => match(true) {
-                        str_contains($product, '奶') || str_contains($product, '酸奶') => '蛋奶',
-                        str_contains($product, '茶') || str_contains($product, '水') || str_contains($product, '汁') || str_contains($product, '可乐') || str_contains($product, '咖啡') || str_contains($product, '凉茶') => '饮料',
-                        str_contains($product, '面') => '主食',
-                        str_contains($product, '蛋糕') || str_contains($product, '面包') || str_contains($product, '饼干') || str_contains($product, '曲奇') || str_contains($product, '蛋') || str_contains($product, '桃酥') || str_contains($product, '月饼') || str_contains($product, '麻薯') || str_contains($product, '泡芙') || str_contains($product, '甜品') || str_contains($product, '绿豆糕') || str_contains($product, '糕') || str_contains($product, '拿破仑') || str_contains($product, '慕斯') || str_contains($product, '芝士') => '零食',
-                        default => '其他',
-                    },
-                    'cal' => 50 + rand(0, 400),
-                    'protein' => 0.5 + rand(0, 15),
-                    'carbs' => 2 + rand(0, 55),
-                    'fat' => 0.1 + rand(0, 25),
+                    'category' => $category,
+                    'cal' => $base['cal'] + rand(-3, 3),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
 
-        // More sauce/condiment brands × types
+        // More sauce/condiment brands × types - type-specific values
         $sauceBrands = ['海天', '李锦记', '千禾', '厨邦', '加加', '恒顺', '鲁花', '金龙鱼', '福临门', '胡姬花', '陈醋', '老干妈', '饭扫光', '乌江', '鱼泉'];
         $sauceTypes = ['生抽', '老抽', '蚝油', '醋', '料酒', '豆瓣酱', '番茄酱', '辣椒酱', '芝麻酱', '甜面酱', '沙茶酱', 'XO酱', '海鲜酱', '柱候酱', '南乳', '豆豉酱', '蒜蓉酱', '香菇酱', '牛肉酱', '鸡肉酱'];
         foreach ($sauceBrands as $brand) {
             foreach (array_slice($sauceTypes, 0, 12) as $sauce) {
+                $base = match(true) {
+                    str_contains($sauce, '生抽') || str_contains($sauce, '老抽') => ['cal' => 53, 'protein' => 5.6, 'carbs' => 5.4, 'fat' => 0.1],
+                    str_contains($sauce, '蚝油') => ['cal' => 132, 'protein' => 3.5, 'carbs' => 25.0, 'fat' => 0.9],
+                    str_contains($sauce, '醋') => ['cal' => 31, 'protein' => 0.4, 'carbs' => 4.9, 'fat' => 0.1],
+                    str_contains($sauce, '料酒') => ['cal' => 62, 'protein' => 0.3, 'carbs' => 5.5, 'fat' => 0],
+                    str_contains($sauce, '豆瓣酱') => ['cal' => 178, 'protein' => 9.5, 'carbs' => 16.8, 'fat' => 8.2],
+                    str_contains($sauce, '番茄酱') => ['cal' => 82, 'protein' => 1.2, 'carbs' => 18.9, 'fat' => 0.2],
+                    str_contains($sauce, '辣椒酱') || str_contains($sauce, '豆豉') => ['cal' => 89, 'protein' => 2.0, 'carbs' => 16.5, 'fat' => 1.8],
+                    str_contains($sauce, '芝麻酱') => ['cal' => 586, 'protein' => 17.3, 'carbs' => 21.2, 'fat' => 49.5],
+                    str_contains($sauce, '甜面酱') => ['cal' => 133, 'protein' => 5.5, 'carbs' => 25.8, 'fat' => 1.6],
+                    str_contains($sauce, '沙茶') || str_contains($sauce, 'XO') || str_contains($sauce, '海鲜') || str_contains($sauce, '柱候') => ['cal' => 200, 'protein' => 6.0, 'carbs' => 18.0, 'fat' => 12.0],
+                    str_contains($sauce, '南乳') => ['cal' => 133, 'protein' => 12.0, 'carbs' => 5.0, 'fat' => 8.0],
+                    str_contains($sauce, '蒜蓉') || str_contains($sauce, '香菇') => ['cal' => 85, 'protein' => 2.0, 'carbs' => 12.0, 'fat' => 3.5],
+                    str_contains($sauce, '牛肉') || str_contains($sauce, '鸡肉') => ['cal' => 180, 'protein' => 10.0, 'carbs' => 12.0, 'fat' => 10.0],
+                    default => ['cal' => 100, 'protein' => 3.0, 'carbs' => 12.0, 'fat' => 4.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$sauce}",
                     'category' => '调味品',
-                    'cal' => 80 + rand(-30, 50),
-                    'protein' => 2 + rand(0, 5),
-                    'carbs' => 10 + rand(-5, 10),
-                    'fat' => 2 + rand(0, 5),
+                    'cal' => $base['cal'] + rand(-3, 3),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
 
-        // More salad dressing brands × types
+        // More salad dressing brands × types - type-specific values
         $moreSaladBrands = ['丘比', '亨氏', '味好美', '百利', '日食记', '李子柒', '海底捞', '好利来', '味多美', '家乐', '太太乐', '王守义', '十三香', '老干妈', '饭扫光'];
         $moreSaladTypes = ['千岛酱', '凯撒酱', '蜂蜜芥末酱', '油醋汁', '芝麻酱', '蛋黄酱', 'ranch', '甜辣酱', '柚子醋', '柠檬汁'];
         foreach ($moreSaladBrands as $brand) {
             foreach (array_slice($moreSaladTypes, 0, 6) as $salad) {
+                $base = match(true) {
+                    str_contains($salad, '油醋') || str_contains($salad, '柚子') || str_contains($salad, '柠檬') => ['cal' => 120, 'protein' => 0.5, 'carbs' => 8.0, 'fat' => 10.0],
+                    str_contains($salad, '蛋黄') || str_contains($salad, 'ranch') => ['cal' => 680, 'protein' => 1.0, 'carbs' => 3.0, 'fat' => 75.0],
+                    str_contains($salad, '千岛') => ['cal' => 475, 'protein' => 1.2, 'carbs' => 28.0, 'fat' => 40.0],
+                    str_contains($salad, '凯撒') => ['cal' => 320, 'protein' => 2.0, 'carbs' => 6.0, 'fat' => 32.0],
+                    str_contains($salad, '蜂蜜芥末') => ['cal' => 280, 'protein' => 1.0, 'carbs' => 20.0, 'fat' => 22.0],
+                    str_contains($salad, '芝麻') => ['cal' => 580, 'protein' => 3.0, 'carbs' => 10.0, 'fat' => 55.0],
+                    str_contains($salad, '甜辣') => ['cal' => 180, 'protein' => 1.0, 'carbs' => 35.0, 'fat' => 5.0],
+                    default => ['cal' => 250, 'protein' => 1.0, 'carbs' => 15.0, 'fat' => 20.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$salad}",
                     'category' => '调味品',
-                    'cal' => 350 + rand(-50, 100),
-                    'protein' => 1 + rand(0, 2),
-                    'carbs' => 5 + rand(-2, 5),
-                    'fat' => 35 + rand(-10, 10),
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-1, 1) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }
@@ -1649,18 +1822,29 @@ class GenerateFoodData extends Command
             }
         }
 
-        // More coffee brands × drinks
+        // More coffee brands × drinks - type-specific values
         $moreCoffeeBrands2 = ['星巴克', '瑞幸', 'Manner', 'Seesaw', 'M Stand', 'Tims', 'costa', '太平洋', '蓝瓶', 'illy', '雀巢', 'UCC', '隅田川', '三顿半', '永璞', '隅田川', 'fibo', '鹰集', 'FISHER', '柯林'];
         $moreCoffeeDrinks = ['美式', '拿铁', '卡布奇诺', '摩卡', '澳白', '冷萃', '手冲', '冰博克', '生椰拿铁', '燕麦拿铁'];
         foreach ($moreCoffeeBrands2 as $brand) {
             foreach (array_slice($moreCoffeeDrinks, 0, 6) as $coffee) {
+                $base = match(true) {
+                    str_contains($coffee, '美式') || str_contains($coffee, '冷萃') || str_contains($coffee, '手冲') => ['cal' => 4, 'protein' => 0.2, 'carbs' => 0, 'fat' => 0],
+                    str_contains($coffee, '拿铁') && !str_contains($coffee, '生椰') && !str_contains($coffee, '燕麦') => ['cal' => 135, 'protein' => 6.5, 'carbs' => 13.5, 'fat' => 6.8],
+                    str_contains($coffee, '生椰') => ['cal' => 125, 'protein' => 4.5, 'carbs' => 15.8, 'fat' => 5.2],
+                    str_contains($coffee, '燕麦') => ['cal' => 120, 'protein' => 3.5, 'carbs' => 16.0, 'fat' => 4.5],
+                    str_contains($coffee, '卡布') => ['cal' => 90, 'protein' => 4.5, 'carbs' => 7.5, 'fat' => 5.0],
+                    str_contains($coffee, '摩卡') => ['cal' => 180, 'protein' => 5.5, 'carbs' => 22.0, 'fat' => 8.5],
+                    str_contains($coffee, '澳白') => ['cal' => 110, 'protein' => 5.0, 'carbs' => 10.0, 'fat' => 5.5],
+                    str_contains($coffee, '冰博克') => ['cal' => 160, 'protein' => 8.0, 'carbs' => 14.0, 'fat' => 8.0],
+                    default => ['cal' => 50, 'protein' => 2.0, 'carbs' => 5.0, 'fat' => 2.0],
+                };
                 $items[] = $this->buildRow([
                     'name' => "{$brand}{$coffee}",
                     'category' => '饮料',
-                    'cal' => 8 + rand(0, 180),
-                    'protein' => 0.5 + rand(0, 50) / 10,
-                    'carbs' => 1 + rand(0, 35),
-                    'fat' => 0.1 + rand(0, 10) / 10,
+                    'cal' => $base['cal'] + rand(-5, 5),
+                    'protein' => $base['protein'],
+                    'carbs' => round($base['carbs'] + rand(-2, 2) / 10, 1),
+                    'fat' => $base['fat'],
                 ]);
             }
         }

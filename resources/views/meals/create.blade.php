@@ -94,6 +94,12 @@
                     </template>
                 </div>
 
+                <!-- No results hint -->
+                <div x-show="searchQuery.length >= 1 && searchResults.length === 0 && !selectedFood" class="mt-2 text-center py-3 text-sm text-gray-500 dark:text-gray-400">
+                    <p class="mb-2">未找到「<span x-text="searchQuery"></span>」</p>
+                    <a :href="'{{ route("foods.create") }}?name=' + encodeURIComponent(searchQuery)" class="text-blue-500 hover:text-blue-600">创建自定义食物 →</a>
+                </div>
+
                 <!-- Selected Food -->
                 <div x-show="selectedFood" class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                     <div class="flex justify-between items-center">

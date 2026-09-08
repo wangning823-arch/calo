@@ -99,6 +99,7 @@ class FoodService
     public function createCustomFood(int $userId, array $data): FoodItem
     {
         return FoodItem::create([
+            'user_id' => $userId,
             'name' => $data['name'],
             'aliases' => isset($data['aliases']) ? json_encode($data['aliases']) : null,
             'category' => $data['category'] ?? '其他',
@@ -156,5 +157,43 @@ class FoodService
         return FavoriteFood::where('user_id', $userId)
             ->where('food_id', $foodId)
             ->exists();
+    }
+
+    public function getCustomFoods(int $userId): Collection
+    {
+        return FoodItem::where('user_id', $userId)
+            ->where('is_user_custom', true)
+            ->orderByDesc('updated_at')
+            ->get();
+    }
+
+    public function updateCustomFood(int $userId, int $foodId, array $data): FoodItem
+    {
+        $food = FoodItem::where('id', $foodId)
+            ->where('user_id', $userId)
+            ->where('is_user_custom', true)
+            ->firstOrFail();
+
+        $food->update([
+            'name' => $data['name'],
+            'category' => $data['category'] ?? $food->category,
+            'calories_per_100g' => $data['calories_per_100g'],
+            'protein_per_100g' => $data['protein_per_100g'] ?? 0,
+            'carbs_per_100g' => $data['carbs_per_100g'] ?? 0,
+            'fat_per_100g' => $data['fat_per_100g'] ?? 0,
+            'version' => $food->version + 1,
+        ]);
+
+        return $food->fresh();
+    }
+
+    public function deleteCustomFood(int $userId, int $foodId): bool
+    {
+        $food = FoodItem::where('id', $foodId)
+            ->where('user_id', $userId)
+            ->where('is_user_custom', true)
+            ->firstOrFail();
+
+        return $food->delete();
     }
 }

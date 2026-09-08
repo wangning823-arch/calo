@@ -97,8 +97,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/foods', [FoodController::class, 'index'])->name('foods.index');
     Route::get('/foods/search', [FoodController::class, 'search'])->name('foods.search');
-    Route::get('/foods/create', fn () => redirect()->route('dashboard'))->name('foods.create');
+    Route::get('/foods/create', [FoodController::class, 'create'])->name('foods.create');
     Route::post('/foods', [FoodController::class, 'store'])->name('foods.store');
+    Route::get('/foods/manage', [FoodController::class, 'manage'])->name('foods.manage');
+    Route::get('/foods/{food}/edit', [FoodController::class, 'edit'])->name('foods.edit');
+    Route::put('/foods/{food}', [FoodController::class, 'update'])->name('foods.update');
+    Route::delete('/foods/{food}', [FoodController::class, 'destroy'])->name('foods.destroy');
     Route::get('/foods/{food}', [FoodController::class, 'show'])->name('foods.show');
     Route::post('/foods/{food}/favorite', [FoodController::class, 'toggleFavorite'])->name('foods.favorite');
     Route::get('/foods/favorites/list', [FoodController::class, 'favorites'])->name('foods.favorites');

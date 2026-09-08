@@ -13,6 +13,66 @@ class FoodController extends Controller
         private FoodService $foodService,
     ) {}
 
+    public function create()
+    {
+        return view('foods.create');
+    }
+
+    public function manage(Request $request)
+    {
+        $foods = $this->foodService->getCustomFoods($request->user()->id);
+
+        return view('foods.manage', compact('foods'));
+    }
+
+    public function edit(Request $request, FoodItem $food)
+    {
+        if ($food->user_id !== $request->user()->id || ! $food->is_user_custom) {
+            abort(403);
+        }
+
+        return view('foods.edit', compact('food'));
+    }
+
+    public function update(Request $request, FoodItem $food)
+    {
+        if ($food->user_id !== $request->user()->id || ! $food->is_user_custom) {
+            abort(403);
+        }
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'category' => ['required', 'string', 'max:50'],
+            'calories_per_100g' => ['required', 'numeric', 'min:0', 'max:10000'],
+            'calorie_unit' => ['nullable', 'in:kcal,kj'],
+            'protein_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'carbs_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'fat_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
+        ]);
+
+        $data = $request->all();
+        if (($data['calorie_unit'] ?? 'kcal') === 'kj') {
+            $data['calories_per_100g'] = round($data['calories_per_100g'] / 4.184, 1);
+        }
+
+        $this->foodService->updateCustomFood($request->user()->id, $food->id, $data);
+
+        return redirect()->route('foods.manage')
+            ->with('success', '食物已更新。');
+    }
+
+    public function destroy(Request $request, FoodItem $food)
+    {
+        if ($food->user_id !== $request->user()->id || ! $food->is_user_custom) {
+            abort(403);
+        }
+
+        $this->foodService->deleteCustomFood($request->user()->id, $food->id);
+
+        return redirect()->route('foods.manage')
+            ->with('success', '食物已删除。');
+    }
+
     public function index(Request $request)
     {
         $categories = $this->foodService->getCategories();
@@ -49,13 +109,21 @@ class FoodController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:50'],
-            'calories_per_100g' => ['required', 'numeric', 'min:0', 'max:1000'],
+            'calories_per_100g' => ['required', 'numeric', 'min:0', 'max:10000'],
+            'calorie_unit' => ['nullable', 'in:kcal,kj'],
             'protein_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'carbs_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'fat_per_100g' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
-        $food = $this->foodService->createCustomFood($request->user()->id, $request->all());
+        $data = $request->all();
+
+        // Convert kJ to kcal if needed (1 kcal = 4.184 kJ)
+        if (($data['calorie_unit'] ?? 'kcal') === 'kj') {
+            $data['calories_per_100g'] = round($data['calories_per_100g'] / 4.184, 1);
+        }
+
+        $food = $this->foodService->createCustomFood($request->user()->id, $data);
 
         return redirect()->route('foods.show', $food)
             ->with('success', '自定义食物已创建。');

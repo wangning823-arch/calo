@@ -65,7 +65,7 @@
             @if($query && $results->isEmpty())
                 <div class="text-center py-8">
                     <div class="text-gray-400 mb-2">未找到"{{ $query }}"</div>
-                    <a href="{{ route('foods.create') }}" class="text-blue-500 text-sm">创建自定义食物</a>
+                    <a href="{{ route('foods.create') }}?name={{ urlencode($query) }}" class="text-blue-500 text-sm">创建自定义食物</a>
                 </div>
             @elseif($results->isNotEmpty())
                 <div class="space-y-2">
@@ -96,7 +96,7 @@
         <!-- Quick Actions -->
         @if(!empty($query))
             <div class="px-4 mt-4">
-                <a href="{{ route('foods.create') }}" class="block w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg text-center text-sm hover:bg-gray-50">
+                <a href="{{ route('foods.create') }}?name={{ urlencode($query) }}" class="block w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-lg text-center text-sm hover:bg-gray-50">
                     + 创建自定义食物
                 </a>
             </div>
