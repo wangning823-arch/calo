@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\WeightGoal;
+use App\Services\GoalService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 
@@ -10,6 +12,7 @@ class ProfileController extends Controller
 {
     public function __construct(
         private UserService $userService,
+        private GoalService $goalService,
     ) {}
 
     public function edit(Request $request)
@@ -29,7 +32,10 @@ class ProfileController extends Controller
             $bmi = $bmiResult['bmi'];
         }
 
-        return view('profile.edit', compact('user', 'age', 'bmr', 'tdee', 'bmi'));
+        $currentGoal = $this->goalService->getCurrentGoal($user);
+        $currentWeight = $latestWeight ? (float) $latestWeight->weight_kg : null;
+
+        return view('profile.edit', compact('user', 'age', 'bmr', 'tdee', 'bmi', 'currentGoal', 'currentWeight'));
     }
 
     public function update(ProfileUpdateRequest $request)
