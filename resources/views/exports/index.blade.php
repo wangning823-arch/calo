@@ -73,7 +73,7 @@
                     <p>导出文件有效期7天，请及时下载。</p>
                 </div>
                 <button @click="requestFullExport()" :disabled="fullExporting"
-                        class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50">
+                        class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50">
                     <span x-show="!fullExporting">申请完整导出</span>
                     <span x-show="fullExporting">提交中...</span>
                 </button>

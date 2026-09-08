@@ -38,7 +38,7 @@
             </div>
 
             <button type="submit"
-                class="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 active:bg-green-800 transition">
+                class="w-full py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition">
                 登录 / 注册
             </button>
         </form>

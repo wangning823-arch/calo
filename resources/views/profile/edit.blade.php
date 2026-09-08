@@ -263,7 +263,7 @@
                 @else
                     <div class="text-center py-4">
                         <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">还没有设定减重目标</p>
-                        <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">设定目标</a>
+                        <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">设定目标</a>
                     </div>
                 @endif
             </div>

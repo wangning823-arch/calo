@@ -29,6 +29,11 @@
     @include('partials.sidebar')
     <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0" x-data="{ sidebarOpen: false, ...dashboard() }">
 
+        <!-- Date Display -->
+        <div class="px-4 pt-4 md:px-6 md:pt-6">
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ now()->isoFormat('YYYY年MM月DD日 dddd') }} · {{ $user->name }}</p>
+        </div>
+
         <!-- Streak Banner -->
         @if($streak > 0)
         <div class="mx-4 mt-4 px-4 py-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg text-center">
@@ -84,7 +89,7 @@
                 </div>
                 @if(!$today['budget'])
                 <div class="mt-4 text-center">
-                    <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">设定减重目标</a>
+                    <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">设定减重目标</a>
                     <p class="text-xs text-gray-400 mt-2">设定目标后即可查看每日热量预算</p>
                 </div>
                 @endif

@@ -88,7 +88,7 @@
 
                     <form method="POST" action="{{ route('settings.cancellation.cancel') }}">
                         @csrf
-                        <button type="submit" class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
                             撤销注销
                         </button>
                     </form>

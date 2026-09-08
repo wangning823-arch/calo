@@ -93,7 +93,7 @@
             @endif
 
             <!-- Import Button -->
-            <button @click="showImport = true" class="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+            <button @click="showImport = true" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
                 一键录入到饮食记录
             </button>
 
@@ -120,7 +120,7 @@
                         <form method="POST" action="{{ route('content.importRecipe', $recipe['id']) }}" class="flex-1">
                             @csrf
                             <input type="hidden" name="meal_type" :value="mealType">
-                            <button type="submit" class="w-full py-2 bg-green-600 text-white rounded-lg text-sm">确认导入</button>
+                            <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-lg text-sm">确认导入</button>
                         </form>
                     </div>
                 </div>
