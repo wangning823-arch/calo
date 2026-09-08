@@ -107,6 +107,7 @@ Route::middleware('auth')->group(function () {
 
 // Meals (requires auth)
 Route::middleware('auth')->group(function () {
+    Route::get('/meals', [MealController::class, 'index'])->name('meals.index');
     Route::get('/meals/create', [MealController::class, 'create'])->name('meals.create');
     Route::post('/meals', [MealController::class, 'store'])->name('meals.store');
     Route::get('/meals/{meal}/edit', [MealController::class, 'edit'])->name('meals.edit');
@@ -118,6 +119,7 @@ Route::middleware('auth')->group(function () {
 
 // Exercises (requires auth)
 Route::middleware('auth')->group(function () {
+    Route::get('/exercises', [ExerciseController::class, 'index'])->name('exercises.index');
     Route::get('/exercises/create', [ExerciseController::class, 'create'])->name('exercises.create');
     Route::post('/exercises', [ExerciseController::class, 'store'])->name('exercises.store');
     Route::get('/exercises/{record}/edit', [ExerciseController::class, 'edit'])->name('exercises.edit');
@@ -128,6 +130,7 @@ Route::middleware('auth')->group(function () {
 
 // Weights (requires auth)
 Route::middleware('auth')->group(function () {
+    Route::get('/weights', [WeightController::class, 'index'])->name('weights.index');
     Route::get('/weights/create', [WeightController::class, 'create'])->name('weights.create');
     Route::post('/weights', [WeightController::class, 'store'])->name('weights.store');
     Route::get('/weights/{record}/edit', [WeightController::class, 'edit'])->name('weights.edit');

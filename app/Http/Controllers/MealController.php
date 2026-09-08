@@ -15,6 +15,20 @@ class MealController extends Controller
         private FoodService $foodService,
     ) {}
 
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $records = MealRecord::where('user_id', $user->id)
+            ->with('food')
+            ->latest('date')
+            ->latest('id')
+            ->paginate(20);
+
+        $mealTypes = ['breakfast' => '早餐', 'lunch' => '午餐', 'dinner' => '晚餐', 'snack' => '加餐'];
+
+        return view('meals.index', compact('user', 'records', 'mealTypes'));
+    }
+
     public function create(Request $request)
     {
         $user = $request->user();

@@ -13,6 +13,17 @@ class WeightController extends Controller
         private WeightService $weightService,
     ) {}
 
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $records = WeightRecord::where('user_id', $user->id)
+            ->latest('date')
+            ->latest('id')
+            ->paginate(20);
+
+        return view('weights.index', compact('user', 'records'));
+    }
+
     public function create(Request $request)
     {
         $user = $request->user();

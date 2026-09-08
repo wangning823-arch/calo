@@ -37,15 +37,15 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     首页
                 </a>
-                <a href="{{ route('meals.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="{{ route('meals.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     记录饮食
                 </a>
-                <a href="{{ route('exercises.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="{{ route('exercises.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     记录运动
                 </a>
-                <a href="{{ route('weights.create') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                <a href="{{ route('weights.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
                     记录体重
                 </a>
@@ -151,7 +151,7 @@
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center">
                             <div class="text-3xl font-bold" :class="statusTextClass">
-                                <span x-text="remaining"></span>
+                                <span x-text="remaining != null ? remaining : '-'"></span>
                             </div>
                             <div class="text-xs text-gray-500">剩余 kcal</div>
                         </div>
@@ -161,7 +161,7 @@
                 <!-- Budget Info -->
                 <div class="grid grid-cols-3 gap-4 text-center mt-4">
                     <div>
-                        <div class="text-lg font-bold text-gray-800" x-text="budget || '-'"></div>
+                        <div class="text-lg font-bold text-gray-800" x-text="budget != null ? budget : '-'"></div>
                         <div class="text-xs text-gray-500">预算</div>
                     </div>
                     <div>
@@ -173,6 +173,12 @@
                         <div class="text-xs text-gray-500">已消耗</div>
                     </div>
                 </div>
+                @if(!$today['budget'])
+                <div class="mt-4 text-center">
+                    <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">设定减重目标</a>
+                    <p class="text-xs text-gray-400 mt-2">设定目标后即可查看每日热量预算</p>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -219,7 +225,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
                 <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">快捷操作</h3>
                 <div class="grid grid-cols-3 gap-3">
-                <a href="{{ route('meals.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                <a href="{{ route('meals.index') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
                     <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -227,7 +233,7 @@
                     </div>
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录饮食</div>
                 </a>
-                <a href="{{ route('exercises.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                <a href="{{ route('exercises.index') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
                     <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -235,7 +241,7 @@
                     </div>
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录运动</div>
                 </a>
-                <a href="{{ route('weights.create') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
+                <a href="{{ route('weights.index') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
                     <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
@@ -271,7 +277,7 @@
             <div class="bg-white rounded-xl shadow-sm p-4">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-medium text-gray-700">今日饮食</h3>
-                    <a href="{{ route('meals.create') }}" class="text-xs text-blue-500">+ 添加</a>
+                    <a href="{{ route('meals.index') }}" class="text-xs text-blue-500">+ 添加</a>
                 </div>
                 @if(isset($today['by_meal']) && count($today['by_meal']) > 0)
                     <div class="space-y-2">
@@ -300,7 +306,7 @@
                     </svg>
                     <span class="text-xs mt-0.5">首页</span>
                 </a>
-                <a href="{{ route('meals.create') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
+                <a href="{{ route('meals.index') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>

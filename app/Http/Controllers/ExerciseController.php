@@ -14,6 +14,18 @@ class ExerciseController extends Controller
         private ExerciseService $exerciseService,
     ) {}
 
+    public function index(Request $request)
+    {
+        $user = $request->user();
+        $records = ExerciseRecord::where('user_id', $user->id)
+            ->with('exerciseType')
+            ->latest('date')
+            ->latest('id')
+            ->paginate(20);
+
+        return view('exercises.index', compact('user', 'records'));
+    }
+
     public function create(Request $request)
     {
         $user = $request->user();
