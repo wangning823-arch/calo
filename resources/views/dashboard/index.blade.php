@@ -17,53 +17,24 @@
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
             .mobile-header-bar { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
     @include('partials.sidebar')
-    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0" x-data="dashboard()">
-        <!-- Mobile Header -->
-        <div class="mobile-header-bar bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10 md:hidden">
-            <div class="px-4 py-3 flex items-center justify-between">
-                <div>
-                    <h1 class="text-lg font-semibold dark:text-white">Calo</h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ now()->isoFormat('YYYY年MM月DD日 dddd') }}</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button @click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light')" class="text-gray-500 dark:text-gray-400">
-                        <svg x-show="!dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                        <svg x-show="dark" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    </button>
-                    <div class="text-right">
-                        <p class="text-sm font-medium dark:text-white">{{ $user->name }}</p>
-                        @if($streak > 0)
-                            <p class="text-xs text-orange-500">🔥 连续{{ $streak }}天</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0" x-data="{ sidebarOpen: false, ...dashboard() }">
 
-        <!-- Desktop Header -->
-        <div class="hidden md:block bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
-            <div class="px-6 py-4 flex items-center justify-between">
-                <div>
-                    <h1 class="text-xl font-bold dark:text-white">首页</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ now()->isoFormat('YYYY年MM月DD日 dddd') }} · {{ $user->name }}@if($streak > 0) · 🔥 连续{{ $streak }}天记录@endif</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button @click="dark = !dark; localStorage.setItem('theme', dark ? 'dark' : 'light')" class="text-gray-500 dark:text-gray-400 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <svg x-show="!dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                        <svg x-show="dark" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    </button>
-                </div>
-            </div>
+        <!-- Streak Banner -->
+        @if($streak > 0)
+        <div class="mx-4 mt-4 px-4 py-2 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg text-center">
+            <span class="text-sm text-orange-600 dark:text-orange-400">🔥 连续{{ $streak }}天记录</span>
         </div>
+        @endif
 
         @if(session('success'))
             <div class="mx-4 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
@@ -235,30 +206,7 @@
         </div>
         </div> <!-- close md:grid -->
 
-        <!-- Mobile Bottom Nav -->
-        <div class="mobile-bottom-nav fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20 md:hidden">
-            <div class="flex justify-around py-2">
-                <a href="{{ route('dashboard') }}" class="flex flex-col items-center px-3 py-1 text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">首页</span>
-                </a>
-                <a href="{{ route('meals.create') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">记录</span>
-                </a>
-                <a href="{{ route('profile.edit') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">我的</span>
-                </a>
-            </div>
-        </div>
-        </div> <!-- close main content wrapper -->
+        <!-- close main content wrapper -->
 
     <script>
         function dashboard() {

@@ -13,6 +13,7 @@ class MealRecord extends Model
     protected $fillable = [
         'user_id',
         'date',
+        'recorded_at',
         'timezone',
         'meal_type',
         'food_id',
@@ -26,6 +27,7 @@ class MealRecord extends Model
     {
         return [
             'date' => 'date',
+            'recorded_at' => 'datetime',
             'serving_grams' => 'decimal:1',
             'calculated_calories' => 'decimal:1',
         ];

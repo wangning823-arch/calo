@@ -20,9 +20,13 @@ class ExerciseService
             (int) $data['duration_minutes']
         );
 
+        $recordedAt = $data['recorded_at'] ?? now()->toDateTimeString();
+        $date = $data['date'] ?? Carbon::parse($recordedAt)->toDateString();
+
         return ExerciseRecord::create([
             'user_id' => $user->id,
-            'date' => $data['date'] ?? now()->toDateString(),
+            'date' => $date,
+            'recorded_at' => $recordedAt,
             'exercise_type_id' => $exerciseType->id,
             'duration_minutes' => $data['duration_minutes'],
             'intensity' => $data['intensity'] ?? $this->guessIntensity($exerciseType->met_value),
@@ -81,13 +85,20 @@ class ExerciseService
             (int) $duration
         );
 
-        $record->update([
+        $updateData = [
             'exercise_type_id' => $exerciseType->id,
             'duration_minutes' => $duration,
             'intensity' => $data['intensity'] ?? $this->guessIntensity($exerciseType->met_value),
             'estimated_calories' => round($estimatedCalories, 1),
             'distance_km' => $data['distance_km'] ?? $record->distance_km,
-        ]);
+        ];
+
+        if (isset($data['recorded_at'])) {
+            $updateData['recorded_at'] = $data['recorded_at'];
+            $updateData['date'] = Carbon::parse($data['recorded_at'])->toDateString();
+        }
+
+        $record->update($updateData);
 
         return $record->fresh();
     }

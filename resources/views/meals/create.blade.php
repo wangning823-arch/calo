@@ -14,9 +14,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }
@@ -65,10 +66,18 @@
                 </div>
             </div>
 
-            <!-- Date -->
+            <!-- Date & Time -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">日期</label>
-                <input type="date" name="date" x-model="date" max="{{ $today }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">日期</label>
+                        <input type="date" name="date" x-model="date" max="{{ $today }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">时间</label>
+                        <input type="time" name="recorded_time" x-model="recordedTime" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                    </div>
+                </div>
             </div>
 
             <!-- Search Food -->
@@ -199,6 +208,7 @@
             return {
                 mealType: '{{ $mealType }}',
                 date: '{{ $today }}',
+                recordedTime: '{{ $now }}',
                 searchQuery: '',
                 searchResults: [],
                 selectedFood: null,

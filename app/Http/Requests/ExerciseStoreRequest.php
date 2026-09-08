@@ -19,6 +19,7 @@ class ExerciseStoreRequest extends FormRequest
             'intensity' => ['nullable', 'in:light,moderate,heavy'],
             'distance_km' => ['nullable', 'numeric', 'min:0', 'max:500'],
             'date' => ['nullable', 'date', 'after_or_equal:' . now()->subDays(30)->toDateString()],
+            'recorded_time' => ['nullable', 'date_format:H:i'],
         ];
     }
 

@@ -14,9 +14,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }
@@ -61,6 +62,20 @@
                         <button type="button" @click="mealType='snack'" :class="mealType==='snack' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'" class="py-2 rounded-lg text-sm font-medium transition-colors">加餐</button>
                     </div>
                     <input type="hidden" name="meal_type" :value="mealType">
+                </div>
+
+                <!-- Date & Time -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">日期</label>
+                            <input type="date" name="date" value="{{ $meal->date->format('Y-m-d') }}" max="{{ now()->toDateString() }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">时间</label>
+                            <input type="time" name="recorded_time" value="{{ $meal->recorded_at ? $meal->recorded_at->format('H:i') : '12:00' }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Food Info -->

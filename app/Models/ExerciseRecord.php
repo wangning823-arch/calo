@@ -13,6 +13,7 @@ class ExerciseRecord extends Model
     protected $fillable = [
         'user_id',
         'date',
+        'recorded_at',
         'exercise_type_id',
         'duration_minutes',
         'intensity',
@@ -24,6 +25,7 @@ class ExerciseRecord extends Model
     {
         return [
             'date' => 'date',
+            'recorded_at' => 'datetime',
             'estimated_calories' => 'decimal:1',
             'distance_km' => 'decimal:2',
         ];

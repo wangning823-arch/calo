@@ -9,9 +9,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }
@@ -46,10 +47,19 @@
             @method('PUT')
 
             <div class="bg-white rounded-xl shadow-sm p-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">运动日期</label>
-                <input type="date" name="date" value="{{ old('date', $record->date->format('Y-m-d')) }}"
-                       max="{{ now()->toDateString() }}"
-                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">运动日期</label>
+                        <input type="date" name="date" value="{{ old('date', $record->date->format('Y-m-d')) }}"
+                               max="{{ now()->toDateString() }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">时间</label>
+                        <input type="time" name="recorded_time" value="{{ old('recorded_time', $record->recorded_at ? $record->recorded_at->format('H:i') : '12:00') }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white rounded-xl shadow-sm p-4">

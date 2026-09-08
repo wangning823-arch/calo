@@ -14,9 +14,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }
@@ -38,7 +39,7 @@
             </div>
         </div>
 
-        <div class="px-4 mt-4 space-y-4" x-data="{ showImport: false, mealType: 'lunch' }">
+        <div class="px-4 mt-4 space-y-4" x-data="{ showImport: false, mealType: '{{ $mealType }}' }">
             <!-- Nutrition Info -->
             <div class="bg-white rounded-xl shadow-sm p-4">
                 <div class="grid grid-cols-4 gap-2 text-center">

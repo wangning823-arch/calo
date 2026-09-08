@@ -14,9 +14,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }

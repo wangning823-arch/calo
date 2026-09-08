@@ -61,6 +61,7 @@ class ContentService
             MealRecord::create([
                 'user_id' => $userId,
                 'date' => now()->toDateString(),
+                'recorded_at' => now()->toDateTimeString(),
                 'meal_type' => $mealType,
                 'food_id' => $food->id,
                 'serving_grams' => 100,

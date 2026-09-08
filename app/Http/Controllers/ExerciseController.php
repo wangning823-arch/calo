@@ -6,6 +6,7 @@ use App\Http\Requests\ExerciseStoreRequest;
 use App\Models\ExerciseRecord;
 use App\Models\ExerciseType;
 use App\Services\ExerciseService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ExerciseController extends Controller
@@ -31,13 +32,19 @@ class ExerciseController extends Controller
         $user = $request->user();
         $exerciseTypes = ExerciseType::orderBy('category')->orderBy('name')->get();
         $categories = $exerciseTypes->pluck('category')->unique()->values();
+        $now = now()->format('H:i');
 
-        return view('exercises.create', compact('user', 'exerciseTypes', 'categories'));
+        return view('exercises.create', compact('user', 'exerciseTypes', 'categories', 'now'));
     }
 
     public function store(ExerciseStoreRequest $request)
     {
-        $this->exerciseService->recordExercise($request->user(), $request->validated());
+        $data = $request->validated();
+        $recordedAt = $this->buildRecordedAt($data['date'] ?? null, $data['recorded_time'] ?? null);
+        $data['recorded_at'] = $recordedAt;
+        unset($data['recorded_time']);
+
+        $this->exerciseService->recordExercise($request->user(), $data);
 
         return redirect()->route('dashboard')
             ->with('success', '运动记录已保存！');
@@ -63,7 +70,15 @@ class ExerciseController extends Controller
             abort(403);
         }
 
-        $this->exerciseService->updateRecord($record, $request->validated());
+        $data = $request->validated();
+
+        if (isset($data['recorded_time'])) {
+            $date = $record->date->toDateString();
+            $data['recorded_at'] = $this->buildRecordedAt($date, $data['recorded_time']);
+        }
+        unset($data['recorded_time']);
+
+        $this->exerciseService->updateRecord($record, $data);
 
         return redirect()->route('dashboard')
             ->with('success', '运动记录已更新！');
@@ -94,5 +109,13 @@ class ExerciseController extends Controller
         }
 
         return response()->json($query->orderBy('category')->orderBy('name')->get());
+    }
+
+    private function buildRecordedAt(?string $date, ?string $time): string
+    {
+        $date = $date ?? now()->toDateString();
+        $time = $time ?? now()->format('H:i');
+
+        return Carbon::parse("{$date} {$time}")->toDateTimeString();
     }
 }

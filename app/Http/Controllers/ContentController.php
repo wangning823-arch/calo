@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\ContentService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ContentController extends Controller
@@ -32,7 +33,28 @@ class ContentController extends Controller
             abort(404);
         }
 
-        return view('content.recipe-detail', compact('recipe'));
+        $mealType = $this->getDefaultMealType();
+
+        return view('content.recipe-detail', compact('recipe', 'mealType'));
+    }
+
+    private function getDefaultMealType(): string
+    {
+        $hour = Carbon::now('Asia/Shanghai')->hour;
+
+        if ($hour >= 6 && $hour < 10) {
+            return 'breakfast';
+        }
+
+        if ($hour >= 11 && $hour < 14) {
+            return 'lunch';
+        }
+
+        if ($hour >= 17 && $hour < 20) {
+            return 'dinner';
+        }
+
+        return 'snack';
     }
 
     public function importRecipe(Request $request, int $id): \Illuminate\Http\RedirectResponse

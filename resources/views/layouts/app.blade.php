@@ -14,12 +14,13 @@
     <style>
         /* Desktop sidebar */
         @media (min-width: 768px) {
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
             .mobile-bottom-nav { display: none !important; }
             .mobile-header { display: none !important; }
             .page-content { padding-bottom: 0 !important; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
     </style>

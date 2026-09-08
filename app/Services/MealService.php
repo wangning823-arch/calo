@@ -23,9 +23,13 @@ class MealService
 
         $calculatedCalories = round($food->calories_per_100g * $servingGrams / 100, 1);
 
+        $recordedAt = $data['recorded_at'] ?? Carbon::now()->toDateTimeString();
+        $date = $data['date'] ?? Carbon::parse($recordedAt)->toDateString();
+
         return MealRecord::create([
             'user_id' => $userId,
-            'date' => $data['date'] ?? Carbon::now()->toDateString(),
+            'date' => $date,
+            'recorded_at' => $recordedAt,
             'timezone' => $data['timezone'] ?? 'Asia/Shanghai',
             'meal_type' => $data['meal_type'],
             'food_id' => $food->id,
@@ -106,6 +110,11 @@ class MealService
             $data['calculated_calories'] = round($food->calories_per_100g * $data['serving_grams'] / 100, 1);
         }
 
+        // Update date from recorded_at if provided
+        if (isset($data['recorded_at'])) {
+            $data['date'] = Carbon::parse($data['recorded_at'])->toDateString();
+        }
+
         $record->update($data);
 
         return $record->fresh();
@@ -143,6 +152,7 @@ class MealService
             'meal_type' => $mealType,
             'serving_grams' => $yesterdayRecord->serving_grams,
             'date' => Carbon::now()->toDateString(),
+            'recorded_at' => Carbon::now()->toDateTimeString(),
             'notes' => '复制自昨日',
         ]);
     }

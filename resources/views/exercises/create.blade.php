@@ -9,9 +9,10 @@
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; }
+            .desktop-sidebar { display: flex !important; flex-direction: column; }
         }
         @media (max-width: 767px) {
+            .mobile-bottom-nav { display: none !important; }
             .desktop-sidebar { display: none !important; }
         }
         body { min-height: 100vh; }
@@ -44,13 +45,22 @@
         <form action="{{ route('exercises.store') }}" method="POST" class="px-4 mt-4 space-y-4" x-data="exerciseForm()">
             @csrf
 
-            <!-- Date -->
+            <!-- Date & Time -->
             <div class="bg-white rounded-xl shadow-sm p-4">
-                <label class="block text-sm font-medium text-gray-700 mb-1">运动日期</label>
-                <input type="date" name="date" value="{{ old('date', now()->toDateString()) }}"
-                       max="{{ now()->toDateString() }}"
-                       min="{{ now()->subDays(30)->toDateString() }}"
-                       class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">运动日期</label>
+                        <input type="date" name="date" value="{{ old('date', now()->toDateString()) }}"
+                               max="{{ now()->toDateString() }}"
+                               min="{{ now()->subDays(30)->toDateString() }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">时间</label>
+                        <input type="time" name="recorded_time" value="{{ old('recorded_time', $now) }}"
+                               class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
             </div>
 
             <!-- Category filter + Exercise type -->
