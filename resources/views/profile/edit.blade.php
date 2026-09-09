@@ -156,49 +156,6 @@
                     </div>
                 </div>
 
-                <!-- Activity Level -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">活动水平</label>
-                    <div class="space-y-2" x-data="{ selected: '{{ old('activity_level', $user->activity_level) }}' }">
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'sedentary' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="activity_level" value="sedentary" x-model="selected" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium dark:text-white">久坐</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">办公室工作，很少运动</div>
-                            </div>
-                            <div class="text-xs text-gray-400 dark:text-gray-500">×1.2</div>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'light' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="activity_level" value="light" x-model="selected" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium dark:text-white">轻度活动</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">每周运动1-3次</div>
-                            </div>
-                            <div class="text-xs text-gray-400 dark:text-gray-500">×1.375</div>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'moderate' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="activity_level" value="moderate" x-model="selected" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium dark:text-white">中度活动</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">每周运动3-5次</div>
-                            </div>
-                            <div class="text-xs text-gray-400 dark:text-gray-500">×1.55</div>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'heavy' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="activity_level" value="heavy" x-model="selected" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium dark:text-white">重度活动</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">每天高强度运动</div>
-                            </div>
-                            <div class="text-xs text-gray-400 dark:text-gray-500">×1.725</div>
-                        </label>
-                    </div>
-                </div>
-
                 <!-- Unit Preference -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">体重单位</label>
@@ -275,7 +232,8 @@
                 <p class="font-medium text-gray-600 dark:text-gray-300 mb-1">计算公式 (Mifflin-St Jeor)</p>
                 <p>男：BMR = 10×体重(kg) + 6.25×身高(cm) − 5×年龄 + 5</p>
                 <p>女：BMR = 10×体重(kg) + 6.25×身高(cm) − 5×年龄 − 161</p>
-                <p class="mt-1">TDEE = BMR × 活动系数</p>
+                <p class="mt-1">基础消耗 = BMR × 1.2（久坐系数）</p>
+                <p>运动消耗通过运动记录自动计算</p>
             </div>
         </div>
 

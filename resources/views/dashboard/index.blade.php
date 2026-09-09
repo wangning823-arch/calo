@@ -75,8 +75,8 @@
                 <!-- Budget Info -->
                 <div class="grid grid-cols-3 gap-4 text-center mt-4">
                     <div>
-                        <div class="text-lg font-bold text-gray-800" x-text="budget != null ? budget : '-'"></div>
-                        <div class="text-xs text-gray-500">预算</div>
+                        <div class="text-lg font-bold text-gray-800" x-text="dynamicBudget != null ? dynamicBudget : '-'"></div>
+                        <div class="text-xs text-gray-500">今日预算</div>
                     </div>
                     <div>
                         <div class="text-lg font-bold text-orange-500" x-text="intake"></div>
@@ -84,8 +84,12 @@
                     </div>
                     <div>
                         <div class="text-lg font-bold text-blue-500" x-text="burned"></div>
-                        <div class="text-xs text-gray-500">已消耗</div>
+                        <div class="text-xs text-gray-500">运动消耗</div>
                     </div>
+                </div>
+                <!-- Budget breakdown -->
+                <div x-show="baseBudget != null && burned > 0" class="mt-2 text-center text-xs text-gray-400">
+                    基础 <span x-text="baseBudget"></span> + 运动 <span x-text="burned" class="text-blue-400"></span> = 今日 <span x-text="dynamicBudget" class="font-medium text-gray-600"></span> kcal
                 </div>
                 @if(!$today['budget'])
                 <div class="mt-4 text-center">
@@ -247,7 +251,9 @@
     <script>
         function dashboard() {
             return {
-                budget: @json($today['budget']),
+                baseBudget: @json($today['budget']),
+                budget: @json($today['dynamic_budget']),
+                dynamicBudget: @json($today['dynamic_budget']),
                 intake: @json($today['intake_calories']),
                 burned: @json($today['burned_calories']),
                 remaining: @json($today['remaining']),

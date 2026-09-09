@@ -6,20 +6,15 @@ use App\Models\User;
 
 class UserService
 {
-    private const ACTIVITY_MULTIPLIERS = [
-        'sedentary' => 1.2,
-        'light' => 1.375,
-        'moderate' => 1.55,
-        'heavy' => 1.725,
-    ];
+    // Sedentary multiplier (desk job, minimal daily movement)
+    // Actual exercise is tracked separately via exercise_records
+    private const BASE_ACTIVITY_MULTIPLIER = 1.2;
 
     public function calculateBMR(User $user): float
     {
-        $weight = (float) $user->height; // placeholder, will use weight from weight_records
         $height = (float) $user->height;
         $age = $user->getAge() ?? 25;
 
-        // Use latest weight record if available, otherwise use a default
         $latestWeight = $user->weightRecords()->latest('date')->first();
         $weightKg = $latestWeight ? (float) $latestWeight->weight_kg : 70.0;
 
@@ -33,9 +28,8 @@ class UserService
     public function calculateTDEE(User $user): float
     {
         $bmr = $this->calculateBMR($user);
-        $multiplier = self::ACTIVITY_MULTIPLIERS[$user->activity_level] ?? 1.2;
 
-        return $bmr * $multiplier;
+        return $bmr * self::BASE_ACTIVITY_MULTIPLIER;
     }
 
     public function calculateAge(User $user): ?int
@@ -71,21 +65,6 @@ class UserService
         ];
     }
 
-    public function calculateDailyCalorieBudget(User $user): float
-    {
-        $tdee = $this->calculateTDEE($user);
-
-        // Default deficit of 500 kcal for weight loss
-        $deficit = 500;
-
-        // Safety lines
-        $minCalories = $user->gender === 'female' ? 1200 : 1500;
-
-        $budget = $tdee - $deficit;
-
-        return max($budget, $minCalories);
-    }
-
     public function updateProfile(User $user, array $data): User
     {
         $user->update([
@@ -93,15 +72,18 @@ class UserService
             'gender' => $data['gender'],
             'date_of_birth' => $data['date_of_birth'],
             'height' => $data['height'],
-            'activity_level' => $data['activity_level'],
             'unit_preference' => $data['unit_preference'] ?? $user->unit_preference ?? 'jin',
         ]);
 
         // Recalculate and update weight goal if active
         $activeGoal = $user->activeWeightGoal;
         if ($activeGoal) {
-            $dailyBudget = $this->calculateDailyCalorieBudget($user);
-            $activeGoal->update(['daily_calorie_budget' => $dailyBudget]);
+            $goalService = app(GoalService::class);
+            $budgetResult = $goalService->calculateDailyBudget($user, $activeGoal->target_deficit);
+            $activeGoal->update([
+                'daily_calorie_budget' => $budgetResult['budget'],
+                'target_deficit' => $budgetResult['actual_deficit'],
+            ]);
         }
 
         return $user->fresh();

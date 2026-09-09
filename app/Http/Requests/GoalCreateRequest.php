@@ -16,7 +16,6 @@ class GoalCreateRequest extends FormRequest
         return [
             'target_weight' => ['required', 'numeric', 'min:30', 'max:300'],
             'target_date' => ['required', 'date', 'after:today'],
-            'target_deficit' => ['nullable', 'numeric', 'min:300', 'max:750'],
             'confirm_warning' => ['nullable', 'boolean'],
         ];
     }
@@ -29,8 +28,6 @@ class GoalCreateRequest extends FormRequest
             'target_weight.max' => '目标体重不能超过300kg。',
             'target_date.required' => '请选择目标日期。',
             'target_date.after' => '目标日期必须是未来。',
-            'target_deficit.min' => '每日缺口不能低于300kcal。',
-            'target_deficit.max' => '每日缺口不能超过750kcal。',
         ];
     }
 }

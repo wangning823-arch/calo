@@ -149,6 +149,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/predictions', [PredictionController::class, 'index'])->name('predictions.index');
     Route::get('/api/predictions', [PredictionController::class, 'api'])->name('api.predictions');
+    Route::get('/api/calendar/{year}/{month}', [PredictionController::class, 'calendarApi'])->name('api.calendar');
 });
 
 // Health alerts (requires auth)

@@ -12,9 +12,7 @@ class GoalService
     private const MAX_WEEKLY_LOSS_WARNING = 1.5; // kg/week
     private const MIN_CALORIES_FEMALE = 1200;
     private const MIN_CALORIES_MALE = 1500;
-    private const DEFAULT_DEFICIT = 500;
-    private const MIN_DEFICIT = 300;
-    private const MAX_DEFICIT = 750;
+    private const KCAL_PER_KG_FAT = 7700;
 
     public function validateGoal(User $user, float $targetWeight, string $targetDate): array
     {
@@ -89,19 +87,48 @@ class GoalService
         ];
     }
 
-    public function calculateDailyBudget(User $user, float $deficit = null): float
+    public function calculateRequiredDeficit(float $currentWeight, float $targetWeight, string $targetDate): array
+    {
+        $weightToLose = $currentWeight - $targetWeight;
+        $daysRemaining = max(1, Carbon::now()->diffInDays(Carbon::parse($targetDate)));
+        $weeksRemaining = max(1, $daysRemaining / 7);
+
+        $dailyDeficit = ($weightToLose * self::KCAL_PER_KG_FAT) / $daysRemaining;
+
+        $weeklyRate = $weightToLose / $weeksRemaining;
+
+        return [
+            'daily_deficit' => round($dailyDeficit),
+            'weight_to_lose' => round($weightToLose, 1),
+            'days_remaining' => $daysRemaining,
+            'weekly_rate' => round($weeklyRate, 2),
+            'is_extreme' => $weeklyRate > self::MAX_WEEKLY_LOSS_WARNING,
+            'is_warning' => $weeklyRate > self::MAX_WEEKLY_LOSS_NORMAL,
+        ];
+    }
+
+    public function calculateDailyBudget(User $user, float $deficit): array
     {
         $userService = app(UserService::class);
         $tdee = $userService->calculateTDEE($user);
 
-        $deficit = $deficit ?? self::DEFAULT_DEFICIT;
-        $deficit = max(self::MIN_DEFICIT, min(self::MAX_DEFICIT, $deficit));
-
         $minCalories = $user->gender === 'female' ? self::MIN_CALORIES_FEMALE : self::MIN_CALORIES_MALE;
 
-        $budget = $tdee - $deficit;
+        $rawBudget = $tdee - $deficit;
+        $isFloored = $rawBudget < $minCalories;
+        $budget = max($rawBudget, $minCalories);
 
-        return max($budget, $minCalories);
+        // If floored, the actual achievable deficit is smaller than requested
+        $actualDeficit = $isFloored ? ($tdee - $minCalories) : $deficit;
+
+        return [
+            'budget' => round($budget),
+            'tdee' => round($tdee),
+            'min_calories' => $minCalories,
+            'raw_budget' => round($rawBudget),
+            'is_floored' => $isFloored,
+            'actual_deficit' => round($actualDeficit),
+        ];
     }
 
     public function createGoal(User $user, array $data): WeightGoal
@@ -109,8 +136,8 @@ class GoalService
         $latestWeight = $user->weightRecords()->latest('date')->first();
         $startWeight = (float) $latestWeight->weight_kg;
 
-        $deficit = $data['target_deficit'] ?? self::DEFAULT_DEFICIT;
-        $dailyBudget = $this->calculateDailyBudget($user, $deficit);
+        $calc = $this->calculateRequiredDeficit($startWeight, $data['target_weight'], $data['target_date']);
+        $budgetResult = $this->calculateDailyBudget($user, $calc['daily_deficit']);
 
         return WeightGoal::create([
             'user_id' => $user->id,
@@ -118,8 +145,8 @@ class GoalService
             'start_weight' => $startWeight,
             'target_weight' => $data['target_weight'],
             'target_date' => $data['target_date'],
-            'daily_calorie_budget' => $dailyBudget,
-            'target_deficit' => $deficit,
+            'daily_calorie_budget' => $budgetResult['budget'],
+            'target_deficit' => $budgetResult['actual_deficit'],
             'status' => 'active',
         ]);
     }
@@ -127,14 +154,18 @@ class GoalService
     public function updateGoal(WeightGoal $goal, array $data): WeightGoal
     {
         $user = $goal->user;
-        $deficit = $data['target_deficit'] ?? $goal->target_deficit;
-        $dailyBudget = $this->calculateDailyBudget($user, $deficit);
+        $targetWeight = $data['target_weight'] ?? $goal->target_weight;
+        $targetDate = $data['target_date'] ?? $goal->target_date;
+        $startWeight = (float) $goal->start_weight;
+
+        $calc = $this->calculateRequiredDeficit($startWeight, $targetWeight, $targetDate);
+        $budgetResult = $this->calculateDailyBudget($user, $calc['daily_deficit']);
 
         $goal->update([
-            'target_weight' => $data['target_weight'] ?? $goal->target_weight,
-            'target_date' => $data['target_date'] ?? $goal->target_date,
-            'daily_calorie_budget' => $dailyBudget,
-            'target_deficit' => $deficit,
+            'target_weight' => $targetWeight,
+            'target_date' => $targetDate,
+            'daily_calorie_budget' => $budgetResult['budget'],
+            'target_deficit' => $budgetResult['actual_deficit'],
         ]);
 
         return $goal->fresh();

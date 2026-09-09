@@ -64,18 +64,22 @@
                 </div>
 
                 <!-- Stats -->
-                <div class="grid grid-cols-3 gap-4 text-center">
+                <div class="grid grid-cols-4 gap-3 text-center">
                     <div>
                         <div class="text-xl font-bold text-gray-800">{{ $currentWeight ? number_format($currentWeight, 1) : '-' }}</div>
-                        <div class="text-xs text-gray-500">当前体重(kg)</div>
+                        <div class="text-xs text-gray-500">当前(kg)</div>
                     </div>
                     <div>
                         <div class="text-xl font-bold text-green-600">{{ $goal->target_weight }}</div>
-                        <div class="text-xs text-gray-500">目标体重(kg)</div>
+                        <div class="text-xs text-gray-500">目标(kg)</div>
+                    </div>
+                    <div>
+                        <div class="text-xl font-bold text-orange-500">-{{ $goal->target_deficit }}</div>
+                        <div class="text-xs text-gray-500">缺口(kcal)</div>
                     </div>
                     <div>
                         <div class="text-xl font-bold text-blue-600">{{ $goal->daily_calorie_budget }}</div>
-                        <div class="text-xs text-gray-500">每日预算(kcal)</div>
+                        <div class="text-xs text-gray-500">预算(kcal)</div>
                     </div>
                 </div>
             </div>
@@ -102,8 +106,12 @@
                     <span class="font-medium">{{ $goal->target_date->format('Y年m月d日') }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">每日缺口</span>
-                    <span class="font-medium">{{ $goal->target_deficit }} kcal</span>
+                    <span class="text-gray-600">每日热量缺口</span>
+                    <span class="font-medium text-orange-500">-{{ $goal->target_deficit }} kcal/天</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">每周减重速率</span>
+                    <span class="font-medium">{{ number_format(($goal->start_weight - $goal->target_weight) / max(1, $goal->created_at->diffInWeeks($goal->target_date)), 1) }} kg/周</span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-600">设定日期</span>

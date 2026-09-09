@@ -68,12 +68,15 @@ class DashboardService
             $burnedCalories += (float) $exercise->estimated_calories;
         }
 
-        $remaining = $budget !== null ? round($budget - $intakeCalories, 1) : null;
+        // Dynamic budget = base (from goal) + today's exercise burn
+        // Exercise calories expand what you can eat today
+        $dynamicBudget = $budget !== null ? round($budget + $burnedCalories, 1) : null;
+        $remaining = $dynamicBudget !== null ? round($dynamicBudget - $intakeCalories, 1) : null;
 
-        // Determine status
+        // Determine status (based on dynamic budget)
         $status = 'normal';
-        if ($budget !== null && $budget > 0) {
-            $ratio = $intakeCalories / $budget;
+        if ($dynamicBudget !== null && $dynamicBudget > 0) {
+            $ratio = $intakeCalories / $dynamicBudget;
             if ($ratio > 1.25) {
                 $status = 'over';
             } elseif ($ratio > 1.1) {
@@ -85,6 +88,7 @@ class DashboardService
 
         return [
             'budget' => $budget,
+            'dynamic_budget' => $dynamicBudget,
             'intake_calories' => round($intakeCalories, 1),
             'intake_protein' => round($intakeProtein, 1),
             'intake_carbs' => round($intakeCarbs, 1),

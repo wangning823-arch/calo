@@ -82,64 +82,71 @@
                 <div>
                     <label for="target_weight" class="block text-sm font-medium text-gray-700 mb-1">目标体重 ({{ $user->unit_preference === 'jin' ? '斤' : 'kg' }})</label>
                     <input type="number" id="target_weight" name="target_weight" step="0.1" min="30" max="300"
-                           value="{{ old('target_weight') }}"
+                           value="{{ old('target_weight', $defaultTargetWeight) }}"
                            x-model="targetWeight"
                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                            placeholder="请输入目标体重">
+                    @if($defaultTargetWeight)
+                        <p class="mt-1 text-xs text-gray-400">推荐值：基于BMI 22计算的理想体重 {{ $defaultTargetWeight }} kg</p>
+                    @endif
                 </div>
 
                 <!-- Target Date -->
                 <div>
                     <label for="target_date" class="block text-sm font-medium text-gray-700 mb-1">目标日期</label>
                     <input type="date" id="target_date" name="target_date"
-                           value="{{ old('target_date') }}"
+                           value="{{ old('target_date', $defaultTargetDate) }}"
                            x-model="targetDate"
                            min="{{ now()->addDay()->format('Y-m-d') }}"
                            class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                    @if($defaultTargetDate)
+                        <p class="mt-1 text-xs text-gray-400">推荐值：按每周减1kg计算，预计 {{ \Carbon\Carbon::parse($defaultTargetDate)->format('Y年m月d日') }} 达成</p>
+                    @endif
                 </div>
 
-                <!-- Daily Deficit -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">每日热量缺口</label>
+                <!-- Calculated Results -->
+                <div class="bg-gray-50 rounded-lg p-4 text-sm" x-show="targetWeight && targetDate && isValidGoal">
+                    <div class="font-medium text-gray-700 mb-2">系统计算结果</div>
                     <div class="space-y-2">
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="deficit == 300 ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
-                            <input type="radio" name="target_deficit" value="300" x-model="deficit" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium">温和减重</div>
-                                <div class="text-xs text-gray-500">每周减约0.6斤</div>
-                            </div>
-                            <div class="text-xs text-gray-400">-300kcal</div>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="deficit == 500 ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
-                            <input type="radio" name="target_deficit" value="500" x-model="deficit" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium">标准减重（推荐）</div>
-                                <div class="text-xs text-gray-500">每周减约1斤</div>
-                            </div>
-                            <div class="text-xs text-gray-400">-500kcal</div>
-                        </label>
-                        <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="deficit == 750 ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'">
-                            <input type="radio" name="target_deficit" value="750" x-model="deficit" class="sr-only">
-                            <div class="flex-1">
-                                <div class="text-sm font-medium">快速减重</div>
-                                <div class="text-xs text-gray-500">每周减约1.5斤</div>
-                            </div>
-                            <div class="text-xs text-gray-400">-750kcal</div>
-                        </label>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">需减重</span>
+                            <span class="font-medium text-red-500" x-text="weightToLose + ' kg'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">剩余天数</span>
+                            <span class="font-medium" x-text="daysRemaining + ' 天'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">每周减重</span>
+                            <span class="font-medium" :class="weeklyRate > 1.0 ? 'text-red-500' : 'text-green-600'" x-text="weeklyRate + ' kg/周'"></span>
+                        </div>
+                        <div class="border-t border-gray-200 pt-2 flex justify-between">
+                            <span class="text-gray-700 font-medium">每日热量缺口</span>
+                            <span class="font-bold text-orange-500" x-text="'-' + dailyDeficit + ' kcal'"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-700 font-medium">每日热量预算</span>
+                            <span class="font-bold text-blue-600" x-text="dailyBudget + ' kcal'"></span>
+                        </div>
+                        <div x-show="rawBudget < minCalories" class="text-xs text-gray-400">
+                            理论预算 <span x-text="rawBudget"></span> kcal 低于安全线 <span x-text="minCalories"></span> kcal，已按最低值计算
+                        </div>
+                    </div>
+                    <!-- Warning for budget floor -->
+                    <div x-show="isBudgetFloored" class="mt-3 p-2 rounded text-xs bg-red-50 text-red-600">
+                        ⚠️ 按您的TDEE（<span x-text="tdee"></span>kcal）和最低安全摄入（<span x-text="minCalories"></span>kcal），最大安全缺口仅 <span x-text="maxSafeDeficit"></span>kcal/天。当前目标需要 <span x-text="dailyDeficit"></span>kcal/天，建议延长目标日期至 <span x-text="realisticDate"></span> 左右。
+                    </div>
+                    <!-- Warning for extreme plans -->
+                    <div x-show="!isBudgetFloored && weeklyRate > 1.0" class="mt-3 p-2 rounded text-xs"
+                         :class="weeklyRate > 1.5 ? 'bg-red-50 text-red-600' : 'bg-yellow-50 text-yellow-700'">
+                        <span x-show="weeklyRate > 1.5">⚠️ 减重速率较快，可能影响健康。建议将目标日期延后。</span>
+                        <span x-show="weeklyRate > 1.0 && weeklyRate <= 1.5">⚠️ 减重速率略高于推荐值（1kg/周），请量力而行。</span>
                     </div>
                 </div>
 
-                <!-- Preview -->
-                <div class="bg-gray-50 rounded-lg p-3 text-sm" x-show="targetWeight && targetDate">
-                    <div class="font-medium text-gray-700 mb-1">预计效果</div>
-                    <div class="space-y-1 text-gray-600">
-                        <div>每周减重：<span class="font-medium" x-text="weeklyRate + ' kg'"></span></div>
-                        <div>剩余天数：<span class="font-medium" x-text="daysRemaining + ' 天'"></span></div>
-                        <div>预计达成：<span class="font-medium" x-text="targetDate"></span></div>
-                    </div>
+                <!-- No goal hint -->
+                <div x-show="!targetWeight || !targetDate || !isValidGoal" class="bg-gray-50 rounded-lg p-3 text-sm text-gray-400 text-center">
+                    请输入目标体重和日期，系统将自动计算热量缺口
                 </div>
 
                 <!-- Confirm Warning -->
@@ -192,20 +199,55 @@
 
     <script>
         function goalForm() {
+            const currentWeight = {{ $currentWeight ?: 70 }};
+            const tdee = {{ $tdee }};
+            const minCalories = {{ $minCalories }};
+            const KCAL_PER_KG = 7700;
+
             return {
-                targetWeight: '{{ old("target_weight") }}',
-                targetDate: '{{ old("target_date") }}',
-                deficit: '{{ old("target_deficit", 500) }}',
-                get weeklyRate() {
-                    if (!this.targetWeight || !this.targetDate) return '-';
-                    const currentWeight = {{ $currentWeight ?: 70 }};
-                    const weeks = Math.max(1, Math.ceil((new Date(this.targetDate) - new Date()) / (7 * 24 * 60 * 60 * 1000)));
-                    const loss = currentWeight - parseFloat(this.targetWeight);
-                    return loss > 0 ? (loss / weeks).toFixed(1) : '-';
+                targetWeight: '{{ old("target_weight", $defaultTargetWeight) }}',
+                targetDate: '{{ old("target_date", $defaultTargetDate) }}',
+                get isValidGoal() {
+                    if (!this.targetWeight || !this.targetDate) return false;
+                    const tw = parseFloat(this.targetWeight);
+                    return tw > 0 && tw < currentWeight;
+                },
+                get weightToLose() {
+                    if (!this.isValidGoal) return 0;
+                    return (currentWeight - parseFloat(this.targetWeight)).toFixed(1);
                 },
                 get daysRemaining() {
-                    if (!this.targetDate) return '-';
-                    return Math.ceil((new Date(this.targetDate) - new Date()) / (24 * 60 * 60 * 1000));
+                    if (!this.targetDate) return 0;
+                    return Math.max(1, Math.ceil((new Date(this.targetDate) - new Date()) / (24 * 60 * 60 * 1000)));
+                },
+                get weeklyRate() {
+                    if (!this.isValidGoal) return 0;
+                    const weeks = Math.max(1, this.daysRemaining / 7);
+                    return ((currentWeight - parseFloat(this.targetWeight)) / weeks).toFixed(1);
+                },
+                get dailyDeficit() {
+                    if (!this.isValidGoal) return 0;
+                    const deficit = Math.round((parseFloat(this.weightToLose) * KCAL_PER_KG) / this.daysRemaining);
+                    return Math.max(300, Math.min(2000, deficit));
+                },
+                get rawBudget() {
+                    return this.isValidGoal ? Math.round(tdee - this.dailyDeficit) : 0;
+                },
+                get dailyBudget() {
+                    return Math.max(minCalories, this.rawBudget);
+                },
+                get isBudgetFloored() {
+                    return this.isValidGoal && this.rawBudget < minCalories;
+                },
+                get maxSafeDeficit() {
+                    return Math.max(0, Math.round(tdee - minCalories));
+                },
+                get realisticDate() {
+                    if (!this.isValidGoal || this.maxSafeDeficit <= 0) return '';
+                    const days = Math.ceil((parseFloat(this.weightToLose) * KCAL_PER_KG) / this.maxSafeDeficit);
+                    const d = new Date();
+                    d.setDate(d.getDate() + days);
+                    return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
                 }
             }
         }
