@@ -2,65 +2,44 @@
 <html lang="zh-CN" x-data="{ dark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" :class="{ 'dark': dark }">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>饮食记录 - Calo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        @media (min-width: 768px) {
-            .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; flex-direction: column; }
-        }
-        @media (max-width: 767px) {
-            .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: none !important; }
-        }
-    </style>
+    @include('partials.app-scripts')
 </head>
-<body class="bg-gray-50 dark:bg-gray-900">
+<body>
     @include('partials.sidebar')
-    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">
+    <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
         <!-- Header -->
-        <div class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
+        <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                <a href="{{ route('dashboard') }}" class="rounded-lg p-1.5 -ml-1.5 text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]" aria-label="返回首页">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">饮食记录</h1>
-                <a href="{{ route('meals.create') }}" class="text-blue-500 text-sm font-medium">+ 新增</a>
+                <h1 class="text-[15px] font-semibold">饮食记录</h1>
+                <a href="{{ route('meals.create') }}" class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/25">新增</a>
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mx-4 mt-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg text-green-700 dark:text-green-300 text-sm">
-                {{ session('success') }}
-            </div>
-        @endif
+        @include('partials.flash')
 
-        <!-- Records -->
-        <div class="px-4 mt-4">
+        <div class="px-4 mt-4 md:px-8">
             @if($records->count() > 0)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm divide-y divide-gray-100 dark:divide-gray-700">
+                <div class="card divide-y divide-[var(--calo-line)] overflow-hidden">
                     @foreach($records as $record)
-                        <div class="p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium dark:text-white">{{ $record->food->name ?? '未知食物' }}</span>
-                                        <span class="text-xs px-2 py-0.5 rounded-full
-                                            {{ $record->meal_type === 'breakfast' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
-                                               ($record->meal_type === 'lunch' ? 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400' :
-                                               ($record->meal_type === 'dinner' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
-                                               'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400')) }}">
+                        <div class="p-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="text-sm font-semibold truncate">{{ $record->food->name ?? '未知食物' }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium
+                                            {{ $record->meal_type === 'breakfast' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                                               ($record->meal_type === 'lunch' ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                                               ($record->meal_type === 'dinner' ? 'bg-sky-50 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300' :
+                                               'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300')) }}">
                                             {{ $mealTypes[$record->meal_type] ?? $record->meal_type }}
                                         </span>
                                     </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <div class="mt-1 text-xs text-[var(--calo-muted)]">
                                         {{ $record->date->format('m/d') }}
                                         @if($record->recorded_at)
                                             {{ $record->recorded_at->format('H:i') }}
@@ -68,14 +47,14 @@
                                         · {{ $record->serving_grams }}g
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-orange-500">{{ round($record->calculated_calories) }} kcal</div>
-                                    <div class="flex gap-2 mt-1">
-                                        <a href="{{ route('meals.edit', $record) }}" class="text-xs text-blue-500">编辑</a>
+                                <div class="text-right shrink-0">
+                                    <div class="font-number text-sm font-bold text-flame-600 dark:text-orange-300">{{ round($record->calculated_calories) }} <span class="text-[11px] font-normal">kcal</span></div>
+                                    <div class="mt-1.5 flex justify-end gap-1">
+                                        <a href="{{ route('meals.edit', $record) }}" class="rounded-md px-2 py-1 text-xs font-medium text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/25">编辑</a>
                                         <form method="POST" action="{{ route('meals.destroy', $record) }}" onsubmit="return confirm('确定删除这条饮食记录？')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-xs text-red-500">删除</button>
+                                            <button type="submit" class="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/25">删除</button>
                                         </form>
                                     </div>
                                 </div>
@@ -85,12 +64,16 @@
                 </div>
                 <div class="mt-4">{{ $records->links() }}</div>
             @else
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
-                    <div class="text-gray-400 mb-2">暂无饮食记录</div>
-                    <a href="{{ route('meals.create') }}" class="text-blue-500 text-sm">去记录饮食</a>
+                <div class="card p-10 text-center">
+                    <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-flame-50 dark:bg-orange-900/25 text-flame-500">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 6v12m4-10v12M8 8v8m8-6v10M4 10v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg>
+                    </div>
+                    <div class="font-medium">暂无饮食记录</div>
+                    <p class="mt-1 text-sm text-[var(--calo-muted)]">记录每一餐，热量收支一目了然</p>
+                    <a href="{{ route('meals.create') }}" class="btn-primary mt-4 inline-flex px-5 py-2.5 text-sm">去记录饮食</a>
                 </div>
             @endif
         </div>
-
-        </body>
+    </div>
+</body>
 </html>

@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" x-data="{ dark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" :class="{ 'dark': dark }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>免责声明 - Calo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @include('partials.app-scripts')
 </head>
 <body>
     @include("partials.sidebar")
-    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">
+    <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
     <div class="max-w-2xl mx-auto px-4 py-8">
         <h1 class="text-2xl font-bold mb-6">免责声明</h1>
         <div class="prose prose-sm text-gray-700 space-y-4">

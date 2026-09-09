@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" x-data="{ dark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" :class="{ 'dark': dark }">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>历史统计 - Calo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @include('partials.app-scripts')
     <style>
         @media (min-width: 768px) {
             .mobile-bottom-nav { display: none !important; }
@@ -20,11 +19,11 @@
 </head>
 <body>
     @include("partials.sidebar")
-    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0"
+    <div class="flex-1 md:ml-64 min-h-screen pb-20 md:pb-0"
          x-data="calendarPage()" x-init="loadCalendar()">
 
         <!-- Header -->
-        <div class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
                 <a href="{{ route('dashboard') }}" class="text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

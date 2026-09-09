@@ -1,32 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" x-data="{ dark: localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches) }" :class="{ 'dark': dark }">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>{{ $food->name }} - Calo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        @media (min-width: 768px) {
-            .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: flex !important; flex-direction: column; }
-        }
-        @media (max-width: 767px) {
-            .mobile-bottom-nav { display: none !important; }
-            .desktop-sidebar { display: none !important; }
-        }
-        body { min-height: 100vh; }
-    </style>
+    @include('partials.app-scripts')
 </head>
 <body>
     @include("partials.sidebar")
-    <div class="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">
-    <div class="min-h-screen pb-20">
+    <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
         <!-- Header -->
-        <div class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
                 <a href="javascript:history.back()" class="text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,31 +114,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Bottom Nav -->
-        <div class="mobile-bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-20 md:hidden">
-            <div class="flex justify-around py-2">
-                <a href="{{ route('dashboard') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">首页</span>
-                </a>
-                <a href="{{ route('foods.search') }}" class="flex flex-col items-center px-3 py-1 text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">搜索</span>
-                </a>
-                <a href="{{ route('foods.favorites') }}" class="flex flex-col items-center px-3 py-1 text-gray-500">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                    </svg>
-                    <span class="text-xs mt-0.5">收藏</span>
-                </a>
-            </div>
-        </div>
-    </div>
-    </div>
+</div>
 </body>
 </html>
