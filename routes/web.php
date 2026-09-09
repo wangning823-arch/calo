@@ -123,6 +123,7 @@ Route::middleware('auth')->group(function () {
 
 // Exercises (requires auth)
 Route::middleware('auth')->group(function () {
+    Route::post('/exercises/quick', [ExerciseController::class, 'quickExercise'])->name('exercises.quick');
     Route::get('/exercises', [ExerciseController::class, 'index'])->name('exercises.index');
     Route::get('/exercises/create', [ExerciseController::class, 'create'])->name('exercises.create');
     Route::post('/exercises', [ExerciseController::class, 'store'])->name('exercises.store');

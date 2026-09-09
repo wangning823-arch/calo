@@ -164,6 +164,37 @@
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-300">记录体重</div>
                 </a>
                 </div>
+
+                <!-- Quick Exercise Buttons -->
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <h4 class="text-xs text-gray-400 mb-3">快速记录运动</h4>
+                    <div class="flex justify-center gap-5">
+                        <button @click="logQuickExercise('run5')"
+                                class="flex flex-col items-center group">
+                            <div class="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:scale-110 transition-transform cursor-pointer">
+                                5
+                            </div>
+                            <span class="text-xs text-gray-400 mt-1">5km慢跑</span>
+                        </button>
+                        <button @click="logQuickExercise('run10')"
+                                class="flex flex-col items-center group">
+                            <div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:scale-110 transition-transform cursor-pointer">
+                                10
+                            </div>
+                            <span class="text-xs text-gray-400 mt-1">10km慢跑</span>
+                        </button>
+                        <button @click="logQuickExercise('strength')"
+                                class="flex flex-col items-center group">
+                            <div class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-110 transition-transform cursor-pointer">
+                                💪
+                            </div>
+                            <span class="text-xs text-gray-400 mt-1">力量1h</span>
+                        </button>
+                    </div>
+                    <div x-show="quickExerciseMsg" x-transition x-cloak
+                         class="mt-3 text-center text-sm" :class="quickExerciseOk ? 'text-green-600' : 'text-red-500'"
+                         x-text="quickExerciseMsg"></div>
+                </div>
             </div>
         </div>
         </div> <!-- close md:grid -->
@@ -225,6 +256,8 @@
                 fat: @json($today['intake_fat']),
                 status: @json($today['status']),
                 showOnboarding: @json($showOnboarding ?? false),
+                quickExerciseMsg: '',
+                quickExerciseOk: false,
                 onboardingStep: 0,
                 onboardingSteps: [
                     { title: '首页看板', desc: '查看今日热量预算和摄入进度', target: 'progress-ring' },
@@ -255,6 +288,30 @@
                         method: 'POST',
                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                     });
+                },
+
+                async logQuickExercise(type) {
+                    this.quickExerciseMsg = '';
+                    try {
+                        const res = await fetch('{{ route("exercises.quick") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ type }),
+                        });
+                        const data = await res.json();
+                        this.quickExerciseOk = res.ok;
+                        this.quickExerciseMsg = data.message || '记录失败';
+                        if (res.ok) {
+                            setTimeout(() => window.location.reload(), 1200);
+                        }
+                    } catch (e) {
+                        this.quickExerciseOk = false;
+                        this.quickExerciseMsg = '网络错误，请重试';
+                    }
                 },
 
                 get proteinPercent() { return this.budget ? (this.protein / (this.budget * 0.3 / 4) * 100) : 0; },

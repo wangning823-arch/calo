@@ -96,6 +96,33 @@ class ExerciseController extends Controller
             ->with('success', '运动记录已删除。');
     }
 
+    public function quickExercise(Request $request)
+    {
+        $presets = [
+            'run5'  => ['exercise_type_id' => 1, 'duration_minutes' => 30, 'distance_km' => 5, 'label' => '5km慢跑'],
+            'run10' => ['exercise_type_id' => 1, 'duration_minutes' => 60, 'distance_km' => 10, 'label' => '10km慢跑'],
+            'strength' => ['exercise_type_id' => 42, 'duration_minutes' => 60, 'distance_km' => null, 'label' => '力量训练1小时'],
+        ];
+
+        $preset = $presets[$request->input('type')] ?? null;
+        if (!$preset) {
+            return response()->json(['error' => '无效的快捷运动类型'], 422);
+        }
+
+        $now = now();
+        $data = [
+            'exercise_type_id' => $preset['exercise_type_id'],
+            'duration_minutes' => $preset['duration_minutes'],
+            'distance_km' => $preset['distance_km'],
+            'recorded_at' => $now->toDateTimeString(),
+            'date' => $now->toDateString(),
+        ];
+
+        $this->exerciseService->recordExercise($request->user(), $data);
+
+        return response()->json(['success' => true, 'message' => $preset['label'] . '已记录！']);
+    }
+
     public function apiExerciseTypes(Request $request)
     {
         $query = ExerciseType::query();
