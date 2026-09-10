@@ -81,7 +81,7 @@ class UserResource extends Resource
                     ->query(fn ($query) => $query->whereNotNull('cancelled_at')),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

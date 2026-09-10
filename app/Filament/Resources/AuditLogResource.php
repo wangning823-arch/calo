@@ -73,7 +73,7 @@ class AuditLogResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->defaultSort('created_at', 'desc');
     }

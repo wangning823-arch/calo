@@ -13,13 +13,13 @@ class ProfileUpdateRequest extends FormRequest
 
     public function rules(): array
     {
-        $userId = $this->user()->id;
-
         return [
             'name' => ['required', 'string', 'max:255'],
             'gender' => ['required', 'in:male,female'],
             'date_of_birth' => ['required', 'date', 'before:' . now()->subYears(10)->format('Y-m-d'), 'after:1920-01-01'],
             'height' => ['required', 'numeric', 'min:30', 'max:250'],
+            'activity_level' => ['required', 'in:sedentary,light,moderate,heavy'],
+            'unit_preference' => ['nullable', 'in:jin,kg'],
         ];
     }
 
@@ -36,6 +36,8 @@ class ProfileUpdateRequest extends FormRequest
             'height.required' => '请填写身高。',
             'height.min' => '身高不能低于30cm。',
             'height.max' => '身高不能超过250cm。',
+            'activity_level.required' => '请选择活动水平。',
+            'activity_level.in' => '请选择有效的活动水平。',
         ];
     }
 }
