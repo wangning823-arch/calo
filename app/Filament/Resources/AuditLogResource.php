@@ -31,13 +31,26 @@ class AuditLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user_id')
                     ->sortable()
                     ->label('用户ID'),
                 Tables\Columns\TextColumn::make('action_type')
+                    ->label('操作类型')
                     ->searchable()
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match (true) {
+                        str_contains($state, 'login_locked') => '登录锁定',
+                        str_contains($state, 'password_reset') => '密码重置',
+                        str_contains($state, 'password') => '密码修改',
+                        str_contains($state, 'cancellation_requested') => '注销申请',
+                        str_contains($state, 'cancellation_revoked') => '注销撤销',
+                        str_contains($state, 'register') => '注册',
+                        str_contains($state, 'logout') => '登出',
+                        str_contains($state, 'login') => '登录',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match (true) {
                         str_contains($state, 'login') => 'success',
                         str_contains($state, 'password') => 'warning',
@@ -45,13 +58,16 @@ class AuditLogResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('ip_address')
+                    ->label('IP地址')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('action_type')
+                    ->label('操作类型')
                     ->options([
                         'login' => '登录',
                         'logout' => '登出',
@@ -62,9 +78,12 @@ class AuditLogResource extends Resource
                         'cancellation_revoked' => '注销撤销',
                     ]),
                 Tables\Filters\Filter::make('created_at')
+                    ->label('时间范围')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('created_from'),
-                        \Filament\Forms\Components\DatePicker::make('created_until'),
+                        \Filament\Forms\Components\DatePicker::make('created_from')
+                            ->label('开始日期'),
+                        \Filament\Forms\Components\DatePicker::make('created_until')
+                            ->label('结束日期'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
@@ -72,9 +91,7 @@ class AuditLogResource extends Resource
                             ->when($data['created_until'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            ->actions([])
             ->defaultSort('created_at', 'desc');
     }
 

@@ -4,8 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TrainingPlanResource\Pages;
 use App\Models\TrainingPlan;
+use Filament\Actions;
+use Filament\Forms\Components\Repeater;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Repeater;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -86,49 +87,75 @@ class TrainingPlanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->label('标题')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('goal')
+                    ->label('目标')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'lose' => '减脂',
+                        'shape' => '塑形',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'lose' => 'danger',
                         'shape' => 'info',
                     }),
                 Tables\Columns\TextColumn::make('difficulty')
+                    ->label('难度')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'beginner' => '新手',
+                        'advanced' => '进阶',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'beginner' => 'success',
                         'advanced' => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('duration_weeks')
+                    ->label('持续周数')
                     ->sortable()
                     ->suffix(' 周'),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('状态')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'draft' => '草稿',
+                        'published' => '已发布',
+                        'archived' => '已归档',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'draft' => 'gray',
                         'published' => 'success',
                         'archived' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('goal')
+                    ->label('目标')
                     ->options([
                         'lose' => '减脂',
                         'shape' => '塑形',
                     ]),
                 Tables\Filters\SelectFilter::make('difficulty')
+                    ->label('难度')
                     ->options([
                         'beginner' => '新手',
                         'advanced' => '进阶',
                     ]),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('状态')
                     ->options([
                         'draft' => '草稿',
                         'published' => '已发布',
@@ -136,9 +163,9 @@ class TrainingPlanResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\Action::make('publish')
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
+                Actions\Action::make('publish')
                     ->label('发布')
                     ->icon('heroicon-o-check')
                     ->color('success')
@@ -147,8 +174,8 @@ class TrainingPlanResource extends Resource
                     ->visible(fn (TrainingPlan $record) => $record->status !== 'published'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

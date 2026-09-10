@@ -3,12 +3,12 @@
 namespace App\Filament\Pages;
 
 use App\Imports\FoodDataImport;
-use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 
 class ImportFoodData extends Page
 {
@@ -30,35 +30,38 @@ class ImportFoodData extends Page
 
     public bool $isProcessing = false;
 
-    protected function getFormSchema(): array
+    public function form(Schema $schema): Schema
     {
-        return [
-            FileUpload::make('file')
-                ->label('上传文件')
-                ->acceptedFileTypes(['text/csv', 'application/json', 'text/plain'])
-                ->maxSize(10240)
-                ->required(),
-            Select::make('format')
-                ->label('文件格式')
-                ->options([
-                    'csv' => 'CSV',
-                    'json' => 'JSON',
-                ])
-                ->default('csv')
-                ->required(),
-            Select::make('source')
-                ->label('数据来源')
-                ->options([
-                    'crawled' => '爬取数据',
-                    'official' => '官方数据',
-                    'user_custom' => '用户自定义',
-                ])
-                ->default('crawled')
-                ->required(),
-            Toggle::make('dry_run')
-                ->label('预览模式（不实际导入）')
-                ->default(false),
-        ];
+        return $schema
+            ->schema([
+                FileUpload::make('file')
+                    ->label('上传文件')
+                    ->acceptedFileTypes(['text/csv', 'application/json', 'text/plain'])
+                    ->maxSize(10240)
+                    ->required()
+                    ->directory('food-imports'),
+                Select::make('format')
+                    ->label('文件格式')
+                    ->options([
+                        'csv' => 'CSV',
+                        'json' => 'JSON',
+                    ])
+                    ->default('csv')
+                    ->required(),
+                Select::make('source')
+                    ->label('数据来源')
+                    ->options([
+                        'crawled' => '爬取数据',
+                        'official' => '官方数据',
+                        'user_custom' => '用户自定义',
+                    ])
+                    ->default('crawled')
+                    ->required(),
+                Toggle::make('dry_run')
+                    ->label('预览模式（不实际导入）')
+                    ->default(false),
+            ])
+            ->statePath('data');
     }
 
     public function mount(): void
@@ -74,14 +77,14 @@ class ImportFoodData extends Page
     {
         $this->isProcessing = true;
 
-        $data = $this->form->getState();
-        $file = $data['file'];
-        $format = $data['format'];
-        $source = $data['source'];
-        $dryRun = $data['dry_run'];
-
         try {
-            $filePath = $file->getRealPath();
+            $data = $this->form->getState();
+            $file = $data['file'];
+            $format = $data['format'];
+            $source = $data['source'];
+            $dryRun = $data['dry_run'];
+
+            $filePath = is_string($file) ? $file : $file->getRealPath();
 
             $import = new FoodDataImport($source, $dryRun);
             $import->import($filePath, $format);

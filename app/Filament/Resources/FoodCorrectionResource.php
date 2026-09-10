@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FoodCorrectionResource\Pages;
 use App\Models\FoodCorrection;
+use Filament\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -56,7 +57,9 @@ class FoodCorrectionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('food.name')
                     ->label('食物')
                     ->searchable(),
@@ -64,10 +67,18 @@ class FoodCorrectionResource extends Resource
                     ->label('提交用户')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('correction_content')
+                    ->label('纠错内容')
                     ->limit(50)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('review_status')
+                    ->label('审核状态')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => '待审核',
+                        'approved' => '已通过',
+                        'rejected' => '已拒绝',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
@@ -77,6 +88,7 @@ class FoodCorrectionResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('review_status')
+                    ->label('审核状态')
                     ->options([
                         'pending' => '待审核',
                         'approved' => '已通过',
@@ -84,7 +96,7 @@ class FoodCorrectionResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Actions\EditAction::make(),
             ]);
     }
 

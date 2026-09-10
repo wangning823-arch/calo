@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeedbackResource\Pages;
 use App\Models\Feedback;
+use Filament\Actions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -61,12 +62,21 @@ class FeedbackResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('用户')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->label('类型')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'bug' => 'Bug报告',
+                        'suggestion' => '功能建议',
+                        'other' => '其他',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'bug' => 'danger',
                         'suggestion' => 'warning',
@@ -74,10 +84,18 @@ class FeedbackResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('content')
+                    ->label('内容')
                     ->limit(50)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('状态')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'open' => '待处理',
+                        'processing' => '处理中',
+                        'resolved' => '已解决',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'open' => 'warning',
                         'processing' => 'info',
@@ -85,17 +103,20 @@ class FeedbackResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
+                    ->label('类型')
                     ->options([
                         'bug' => 'Bug报告',
                         'suggestion' => '功能建议',
                         'other' => '其他',
                     ]),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('状态')
                     ->options([
                         'open' => '待处理',
                         'processing' => '处理中',
@@ -103,7 +124,7 @@ class FeedbackResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Actions\EditAction::make(),
             ]);
     }
 

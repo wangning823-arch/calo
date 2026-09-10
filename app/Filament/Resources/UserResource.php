@@ -31,23 +31,41 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('姓名')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('phone')
+                    ->label('手机号')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('gender')
+                    ->label('性别')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'male' => '男',
+                        'female' => '女',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'male' => 'info',
                         'female' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('height')
+                    ->label('身高')
                     ->sortable()
                     ->suffix('cm'),
                 Tables\Columns\TextColumn::make('activity_level')
+                    ->label('活动水平')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'sedentary' => '久坐',
+                        'light' => '轻度',
+                        'moderate' => '中度',
+                        'heavy' => '重度',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'sedentary' => 'gray',
                         'light' => 'info',
@@ -55,21 +73,25 @@ class UserResource extends Resource
                         'heavy' => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('cancelled_at')
+                    ->label('注销时间')
                     ->dateTime()
                     ->sortable()
                     ->color(fn ($state) => $state ? 'danger' : null),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('注册时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('gender')
+                    ->label('性别')
                     ->options([
                         'male' => '男',
                         'female' => '女',
                     ]),
                 Tables\Filters\SelectFilter::make('activity_level')
+                    ->label('活动水平')
                     ->options([
                         'sedentary' => '久坐',
                         'light' => '轻度',
@@ -80,9 +102,7 @@ class UserResource extends Resource
                     ->label('已注销')
                     ->query(fn ($query) => $query->whereNotNull('cancelled_at')),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            ->actions([])
             ->defaultSort('created_at', 'desc');
     }
 

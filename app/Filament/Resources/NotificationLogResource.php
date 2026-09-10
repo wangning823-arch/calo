@@ -31,12 +31,21 @@ class NotificationLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('user_id')
                     ->sortable()
                     ->label('用户ID'),
                 Tables\Columns\TextColumn::make('type')
+                    ->label('类型')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'reminder' => '提醒',
+                        'alert' => '预警',
+                        'achievement' => '成就',
+                        'system' => '系统',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'reminder' => 'info',
                         'alert' => 'danger',
@@ -44,9 +53,17 @@ class NotificationLogResource extends Resource
                         'system' => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('title')
+                    ->label('标题')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('send_status')
+                    ->label('发送状态')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'sent' => '已发送',
+                        'failed' => '发送失败',
+                        'pending' => '待发送',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'sent' => 'success',
                         'failed' => 'danger',
@@ -54,18 +71,22 @@ class NotificationLogResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('sent_at')
+                    ->label('发送时间')
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('read_at')
+                    ->label('阅读时间')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label('创建时间')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
+                    ->label('类型')
                     ->options([
                         'reminder' => '提醒',
                         'alert' => '预警',
@@ -73,15 +94,14 @@ class NotificationLogResource extends Resource
                         'system' => '系统',
                     ]),
                 Tables\Filters\SelectFilter::make('send_status')
+                    ->label('发送状态')
                     ->options([
                         'sent' => '已发送',
                         'failed' => '发送失败',
                         'pending' => '待发送',
                     ]),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+            ->actions([])
             ->defaultSort('created_at', 'desc');
     }
 

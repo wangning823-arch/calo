@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FoodItemResource\Pages;
 use App\Models\FoodItem;
+use Filament\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -111,21 +112,33 @@ class FoodItemResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('名称')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category')
+                    ->label('分类')
                     ->sortable()
                     ->badge(),
                 Tables\Columns\TextColumn::make('calories_per_100g')
+                    ->label('热量')
                     ->sortable()
                     ->suffix(' kcal'),
                 Tables\Columns\TextColumn::make('protein_per_100g')
                     ->label('蛋白质')
                     ->suffix('g'),
                 Tables\Columns\TextColumn::make('source')
+                    ->label('来源')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'crawled' => '爬取',
+                        'official' => '官方',
+                        'user_custom' => '用户自定义',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'crawled' => 'warning',
                         'official' => 'success',
@@ -133,7 +146,14 @@ class FoodItemResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('review_status')
+                    ->label('审核状态')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => '待审核',
+                        'approved' => '已通过',
+                        'rejected' => '已拒绝',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'approved' => 'success',
@@ -143,6 +163,7 @@ class FoodItemResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
+                    ->label('分类')
                     ->options([
                         '主食' => '主食',
                         '蔬菜' => '蔬菜',
@@ -151,12 +172,14 @@ class FoodItemResource extends Resource
                         '其他' => '其他',
                     ]),
                 Tables\Filters\SelectFilter::make('review_status')
+                    ->label('审核状态')
                     ->options([
                         'pending' => '待审核',
                         'approved' => '已通过',
                         'rejected' => '已拒绝',
                     ]),
                 Tables\Filters\SelectFilter::make('source')
+                    ->label('来源')
                     ->options([
                         'crawled' => '爬取',
                         'official' => '官方',
@@ -164,12 +187,12 @@ class FoodItemResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
