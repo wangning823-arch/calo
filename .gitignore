@@ -21,6 +21,8 @@
 /public/hot
 /public/js/filament
 /public/storage
+/public/vendor
+public/test_symfony.php
 /storage/*.key
 /database/database.sqlite
 /storage/pail
