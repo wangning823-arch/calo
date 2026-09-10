@@ -42,6 +42,17 @@ class AdminPanelTest extends TestCase
             ->assertRedirect('/login');
     }
 
+    public function test_admin_pages_load_with_livewire_header(): void
+    {
+        // wire:navigate 会带 X-Livewire 头整页 GET，不应触发 MethodNotAllowed
+        foreach (['/admin', '/admin/import-food-data', '/admin/food-items', '/admin/users'] as $page) {
+            $this->actingAs($this->admin)
+                ->withHeaders(['X-Livewire' => '1'])
+                ->get($page)
+                ->assertOk("Failed on Livewire navigation to: {$page}");
+        }
+    }
+
     public function test_admin_dashboard_loads(): void
     {
         $this->actingAs($this->admin)
