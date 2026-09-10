@@ -12,23 +12,16 @@
         <!-- Header -->
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('foods.manage') }}" class="text-gray-600 dark:text-gray-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                <a href="{{ route('foods.manage') }}" class="inline-flex items-center gap-1 rounded-lg p-1.5 -ml-1.5 text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+                    <span class="text-sm">返回</span>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">编辑食物</h1>
-                <div class="w-6"></div>
+                <h1 class="text-[15px] font-semibold">编辑食物</h1>
+                <div class="w-14"></div>
             </div>
         </div>
 
-        @if($errors->any())
-            <div class="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300 text-sm">
-                @foreach($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
+        @include('partials.flash')
 
         <form action="{{ route('foods.update', $food) }}" method="POST" class="px-4 mt-4 space-y-4"
               x-data="{ unit: 'kcal', calories: '{{ $food->calories_per_100g }}' }">
@@ -36,17 +29,16 @@
             @method('PUT')
 
             <!-- Food Name -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">食物名称</label>
+            <div class="card p-4">
+                <label class="mb-1.5 block text-sm font-medium">食物名称</label>
                 <input type="text" name="name" value="{{ old('name', $food->name) }}" required maxlength="255"
-                       class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                       class="input-field">
             </div>
 
             <!-- Category -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">分类</label>
-                <select name="category"
-                        class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <div class="card p-4">
+                <label class="mb-1.5 block text-sm font-medium">分类</label>
+                <select name="category" class="input-field">
                     @foreach(['主食', '蔬菜', '水果', '肉类', '蛋奶', '零食', '饮料', '调味品', '其他'] as $cat)
                         <option value="{{ $cat }}" {{ old('category', $food->category) === $cat ? 'selected' : '' }}>{{ $cat }}</option>
                     @endforeach
@@ -54,56 +46,58 @@
             </div>
 
             <!-- Calories with unit toggle -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">热量 (每100g)</label>
+            <div class="card p-4">
+                <div class="mb-3 flex items-center justify-between">
+                    <label class="block text-sm font-medium">热量 (每100g)</label>
                     <div class="flex gap-1 text-xs">
-                        <button type="button" @click="unit = 'kcal'" class="px-2 py-1 rounded"
-                                :class="unit === 'kcal' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'">kcal</button>
-                        <button type="button" @click="unit = 'kj'" class="px-2 py-1 rounded"
-                                :class="unit === 'kj' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'">kJ</button>
+                        <button type="button" @click="unit = 'kcal'"
+                                :class="unit === 'kcal' ? 'bg-brand-600 text-white shadow-soft' : 'bg-black/[0.04] dark:bg-white/[0.06] text-[var(--calo-muted)]'"
+                                class="px-2.5 py-1 rounded-lg font-medium transition">kcal</button>
+                        <button type="button" @click="unit = 'kj'"
+                                :class="unit === 'kj' ? 'bg-brand-600 text-white shadow-soft' : 'bg-black/[0.04] dark:bg-white/[0.06] text-[var(--calo-muted)]'"
+                                class="px-2.5 py-1 rounded-lg font-medium transition">kJ</button>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <input type="number" name="calories_per_100g" step="0.1" min="0" max="10000"
                            x-model="calories" value="{{ old('calories_per_100g', $food->calories_per_100g) }}" required
-                           class="flex-1 px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <span class="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap" x-text="unit === 'kcal' ? 'kcal' : 'kJ'"></span>
+                           class="input-field flex-1 font-number">
+                    <span class="text-sm text-[var(--calo-muted)] whitespace-nowrap" x-text="unit === 'kcal' ? 'kcal' : 'kJ'"></span>
                 </div>
                 <input type="hidden" name="calorie_unit" :value="unit">
-                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                <p class="text-xs text-[var(--calo-muted)] mt-2">
                     <span x-show="unit === 'kcal'">1 kcal ≈ 4.184 kJ</span>
                     <span x-show="unit === 'kj'">1 kJ ≈ 0.239 kcal</span>
                 </p>
             </div>
 
             <!-- Optional nutrition -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">营养素 (每100g，可选)</h3>
+            <div class="card p-4">
+                <h3 class="mb-3 text-sm font-semibold">营养素 (每100g，可选)</h3>
                 <div class="grid grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">蛋白质 (g)</label>
+                        <label class="mb-1 block text-xs text-[var(--calo-muted)]">蛋白质 (g)</label>
                         <input type="number" name="protein_per_100g" step="0.1" min="0" max="100"
                                value="{{ old('protein_per_100g', $food->protein_per_100g) }}"
-                               class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                               class="input-field font-number">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">碳水 (g)</label>
+                        <label class="mb-1 block text-xs text-[var(--calo-muted)]">碳水 (g)</label>
                         <input type="number" name="carbs_per_100g" step="0.1" min="0" max="100"
                                value="{{ old('carbs_per_100g', $food->carbs_per_100g) }}"
-                               class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                               class="input-field font-number">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">脂肪 (g)</label>
+                        <label class="mb-1 block text-xs text-[var(--calo-muted)]">脂肪 (g)</label>
                         <input type="number" name="fat_per_100g" step="0.1" min="0" max="100"
                                value="{{ old('fat_per_100g', $food->fat_per_100g) }}"
-                               class="w-full px-2 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                               class="input-field font-number">
                     </div>
                 </div>
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            <button type="submit" class="btn-primary w-full py-3.5 text-[15px]">
                 保存修改
             </button>
         </form>

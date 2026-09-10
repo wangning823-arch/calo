@@ -6,63 +6,57 @@
     <title>运动记录 - Calo</title>
     @include('partials.app-scripts')
 </head>
-<body >
+<body>
     @include('partials.sidebar')
     <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
         <!-- Header -->
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                <a href="{{ route('dashboard') }}" class="rounded-lg p-1.5 -ml-1.5 text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]" aria-label="返回首页">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">运动记录</h1>
-                <a href="{{ route('exercises.create') }}" class="text-blue-500 text-sm font-medium">+ 新增</a>
+                <h1 class="text-[15px] font-semibold">运动记录</h1>
+                <a href="{{ route('exercises.create') }}" class="rounded-lg px-2.5 py-1.5 text-sm font-medium text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/25">新增</a>
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mx-4 mt-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg text-green-700 dark:text-green-300 text-sm">
-                {{ session('success') }}
-            </div>
-        @endif
+        @include('partials.flash')
 
         <!-- Date filter -->
-        <div class="px-4 mt-4">
-            <form method="GET" action="{{ route('exercises.index') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3">
+        <div class="px-4 mt-4 md:px-8">
+            <form method="GET" action="{{ route('exercises.index') }}" class="card p-3">
                 <div class="flex flex-wrap items-end gap-2">
                     <div class="flex-1 min-w-[160px] max-w-xs">
-                        <label for="date" class="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">日期</label>
+                        <label for="date" class="block text-[11px] text-[var(--calo-muted)] mb-1">日期</label>
                         <input type="date" id="date" name="date" value="{{ $date }}"
-                               class="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2.5 py-2 text-sm text-gray-900 dark:text-white">
+                               class="w-full rounded-lg border border-[var(--calo-line)] bg-white dark:bg-white/[0.04] dark:border-white/10 px-2.5 py-2 text-sm text-[var(--calo-ink)]">
                     </div>
                     <div class="flex gap-2">
-                        <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">查询</button>
-                        <a href="{{ route('exercises.index', ['date' => now()->toDateString()]) }}" class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-500 dark:text-gray-400">今天</a>
+                        <button type="submit" class="btn-primary px-4 py-2 text-sm">查询</button>
+                        <a href="{{ route('exercises.index', ['date' => now()->toDateString()]) }}" class="rounded-lg border border-[var(--calo-line)] px-3 py-2 text-sm text-[var(--calo-muted)] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]">今天</a>
                     </div>
                 </div>
             </form>
         </div>
 
         <!-- Records -->
-        <div class="px-4 mt-4">
+        <div class="px-4 mt-4 md:px-8">
             @if($records->count() > 0)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm divide-y divide-gray-100 dark:divide-gray-700">
+                <div class="card divide-y divide-[var(--calo-line)] overflow-hidden">
                     @foreach($records as $record)
-                        <div class="p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium dark:text-white">{{ $record->exerciseType->name ?? '未知运动' }}</span>
-                                        <span class="text-xs px-2 py-0.5 rounded-full
-                                            {{ $record->intensity === 'heavy' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
-                                               ($record->intensity === 'moderate' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                               'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400') }}">
+                        <div class="p-4 hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <span class="text-sm font-semibold truncate">{{ $record->exerciseType->name ?? '未知运动' }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium
+                                            {{ $record->intensity === 'heavy' ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                               ($record->intensity === 'moderate' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                               'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300') }}">
                                             {{ $record->intensity === 'heavy' ? '高强度' : ($record->intensity === 'moderate' ? '中强度' : '低强度') }}
                                         </span>
                                     </div>
-                                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    <div class="mt-1 text-xs text-[var(--calo-muted)]">
                                         {{ $record->date->format('m/d') }}
                                         @if($record->recorded_at)
                                             {{ $record->recorded_at->format('H:i') }}
@@ -73,14 +67,14 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-sm font-bold text-orange-500">{{ round($record->estimated_calories) }} kcal</div>
-                                    <div class="flex gap-2 mt-1">
-                                        <a href="{{ route('exercises.edit', $record) }}" class="text-xs text-blue-500">编辑</a>
+                                <div class="text-right shrink-0">
+                                    <div class="font-number text-sm font-bold text-flame-600 dark:text-orange-300">{{ round($record->estimated_calories) }} <span class="text-[11px] font-normal">kcal</span></div>
+                                    <div class="mt-1.5 flex justify-end gap-1">
+                                        <a href="{{ route('exercises.edit', $record) }}" class="rounded-md px-2 py-1 text-xs font-medium text-brand-700 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/25">编辑</a>
                                         <form method="POST" action="{{ route('exercises.destroy', $record) }}" onsubmit="return confirm('确定删除这条运动记录？')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-xs text-red-500">删除</button>
+                                            <button type="submit" class="rounded-md px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/25">删除</button>
                                         </form>
                                     </div>
                                 </div>
@@ -90,13 +84,16 @@
                 </div>
                 <div class="mt-4">{{ $records->links() }}</div>
             @else
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
-                    <div class="text-gray-400 mb-2">该日暂无运动记录</div>
-                    <a href="{{ route('exercises.create') }}" class="text-blue-500 text-sm">去记录运动</a>
+                <div class="card p-10 text-center">
+                    <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 dark:bg-brand-900/25 text-brand-500">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <div class="font-medium">该日暂无运动记录</div>
+                    <p class="mt-1 text-sm text-[var(--calo-muted)]">记录每一次运动，热量消耗一目了然</p>
+                    <a href="{{ route('exercises.create') }}" class="btn-primary mt-4 inline-flex px-5 py-2.5 text-sm">去记录运动</a>
                 </div>
             @endif
         </div>
-
-        </div>
+    </div>
 </body>
 </html>

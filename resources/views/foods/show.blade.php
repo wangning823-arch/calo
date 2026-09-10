@@ -12,15 +12,14 @@
         <!-- Header -->
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="javascript:history.back()" class="text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                <a href="javascript:history.back()" class="inline-flex items-center gap-1 rounded-lg p-1.5 -ml-1.5 text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+                    <span class="text-sm">返回</span>
                 </a>
-                <h1 class="text-lg font-semibold">食物详情</h1>
+                <h1 class="text-[15px] font-semibold">食物详情</h1>
                 <form action="{{ route('foods.favorite', $food) }}" method="POST">
                     @csrf
-                    <button type="submit" class="text-{{ $isFavorite ? 'red' : 'gray' }}-500">
+                    <button type="submit" class="rounded-lg p-1.5 -mr-1.5 {{ $isFavorite ? 'text-red-500' : 'text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]' }}">
                         <svg class="w-6 h-6" fill="{{ $isFavorite ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                         </svg>
@@ -29,61 +28,57 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="mx-4 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                {{ session('success') }}
-            </div>
-        @endif
+        @include('partials.flash')
 
         <!-- Food Info -->
         <div class="px-4 mt-4">
-            <div class="bg-white rounded-xl shadow-sm p-4">
-                <div class="flex items-start justify-between mb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800">{{ $food->name }}</h2>
-                        <div class="text-sm text-gray-500 mt-1">{{ $food->category }}</div>
+            <div class="card p-4">
+                <div class="mb-4 flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <h2 class="text-xl font-bold">{{ $food->name }}</h2>
+                        <div class="mt-1 text-sm text-[var(--calo-muted)]">{{ $food->category }}</div>
                         @if($food->aliases)
-                            <div class="text-xs text-gray-400 mt-1">
+                            <div class="mt-1 text-xs text-[var(--calo-muted)]">
                                 别名: {{ is_array(json_decode($food->aliases)) ? implode(', ', json_decode($food->aliases)) : $food->aliases }}
                             </div>
                         @endif
                     </div>
                     @if($food->is_user_custom)
-                        <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">自定义</span>
+                        <span class="shrink-0 rounded-full bg-brand-50 dark:bg-brand-900/25 px-2.5 py-1 text-xs font-medium text-brand-700 dark:text-brand-300">自定义</span>
                     @endif
                 </div>
 
                 <!-- Nutrition per 100g -->
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h3 class="text-sm font-medium text-gray-700 mb-3">每100g营养成分</h3>
+                <div class="rounded-xl bg-black/[0.03] dark:bg-white/[0.04] p-4">
+                    <h3 class="mb-3 text-sm font-semibold">每100g营养成分</h3>
                     <div class="grid grid-cols-4 gap-3 text-center">
                         <div>
-                            <div class="text-xl font-bold text-orange-500">{{ $food->calories_per_100g }}</div>
-                            <div class="text-xs text-gray-500">热量(kcal)</div>
+                            <div class="font-number text-xl font-bold text-flame-600 dark:text-orange-300">{{ $food->calories_per_100g }}</div>
+                            <div class="text-xs text-[var(--calo-muted)]">热量(kcal)</div>
                         </div>
                         <div>
-                            <div class="text-xl font-bold text-red-500">{{ $food->protein_per_100g }}</div>
-                            <div class="text-xs text-gray-500">蛋白质(g)</div>
+                            <div class="font-number text-xl font-bold text-rose-600 dark:text-rose-400">{{ $food->protein_per_100g }}</div>
+                            <div class="text-xs text-[var(--calo-muted)]">蛋白质(g)</div>
                         </div>
                         <div>
-                            <div class="text-xl font-bold text-yellow-500">{{ $food->carbs_per_100g }}</div>
-                            <div class="text-xs text-gray-500">碳水(g)</div>
+                            <div class="font-number text-xl font-bold text-amber-600 dark:text-amber-400">{{ $food->carbs_per_100g }}</div>
+                            <div class="text-xs text-[var(--calo-muted)]">碳水(g)</div>
                         </div>
                         <div>
-                            <div class="text-xl font-bold text-blue-500">{{ $food->fat_per_100g }}</div>
-                            <div class="text-xs text-gray-500">脂肪(g)</div>
+                            <div class="font-number text-xl font-bold text-brand-600 dark:text-brand-400">{{ $food->fat_per_100g }}</div>
+                            <div class="text-xs text-[var(--calo-muted)]">脂肪(g)</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Serving Info -->
-                <div class="mt-4 text-sm text-gray-600">
-                    <div class="flex justify-between py-2 border-b border-gray-100">
+                <div class="mt-4 text-sm">
+                    <div class="flex justify-between py-2 border-b border-[var(--calo-line)]">
                         <span>标准份量</span>
                         <span class="font-medium">{{ $food->serving_size }}{{ $food->serving_unit }}</span>
                     </div>
                     @if($food->source)
-                        <div class="flex justify-between py-2 border-b border-gray-100">
+                        <div class="flex justify-between py-2 border-b border-[var(--calo-line)]">
                             <span>数据来源</span>
                             <span class="font-medium">{{ $food->source }}</span>
                         </div>
@@ -94,8 +89,8 @@
 
         <!-- Macros Ratio -->
         <div class="px-4 mt-4">
-            <div class="bg-white rounded-xl shadow-sm p-4">
-                <h3 class="text-sm font-medium text-gray-700 mb-3">营养素比例</h3>
+            <div class="card p-4">
+                <h3 class="mb-3 text-sm font-semibold">营养素比例</h3>
                 @php
                     $total = $food->protein_per_100g * 4 + $food->carbs_per_100g * 4 + $food->fat_per_100g * 9;
                     $proteinPct = $total > 0 ? round(($food->protein_per_100g * 4 / $total) * 100) : 0;
@@ -103,11 +98,11 @@
                     $fatPct = $total > 0 ? round(($food->fat_per_100g * 9 / $total) * 100) : 0;
                 @endphp
                 <div class="flex h-4 rounded-full overflow-hidden">
-                    <div class="bg-red-400" style="width: {{ $proteinPct }}%"></div>
-                    <div class="bg-yellow-400" style="width: {{ $carbsPct }}%"></div>
-                    <div class="bg-blue-400" style="width: {{ $fatPct }}%"></div>
+                    <div class="bg-rose-400" style="width: {{ $proteinPct }}%"></div>
+                    <div class="bg-amber-400" style="width: {{ $carbsPct }}%"></div>
+                    <div class="bg-brand-400" style="width: {{ $fatPct }}%"></div>
                 </div>
-                <div class="flex justify-between mt-2 text-xs text-gray-500">
+                <div class="mt-2 flex justify-between text-xs text-[var(--calo-muted)]">
                     <span>蛋白质 {{ $proteinPct }}%</span>
                     <span>碳水 {{ $carbsPct }}%</span>
                     <span>脂肪 {{ $fatPct }}%</span>

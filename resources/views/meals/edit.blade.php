@@ -9,25 +9,19 @@
 <body>
     @include("partials.sidebar")
     <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
+        <!-- Header -->
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-300">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
+                <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-1 rounded-lg p-1.5 -ml-1.5 text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/></svg>
+                    <span class="text-sm">返回</span>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">编辑记录</h1>
-                <div class="w-6"></div>
+                <h1 class="text-[15px] font-semibold">编辑记录</h1>
+                <div class="w-14"></div>
             </div>
         </div>
 
-        @if($errors->any())
-            <div class="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
-                @foreach($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
+        @include('partials.flash')
 
         <div class="px-4 mt-4" x-data="{ mealType: '{{ $meal->meal_type }}' }">
             <form method="POST" action="{{ route('meals.update', $meal) }}">
@@ -35,52 +29,53 @@
                 @method('PUT')
 
                 <!-- Meal Type -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">餐次</label>
+                <div class="card p-4 mb-4">
+                    <label class="mb-2.5 block text-sm font-semibold">餐次</label>
                     <div class="grid grid-cols-4 gap-2">
-                        <button type="button" @click="mealType='breakfast'" :class="mealType==='breakfast' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'" class="py-2 rounded-lg text-sm font-medium transition-colors">早餐</button>
-                        <button type="button" @click="mealType='lunch'" :class="mealType==='lunch' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'" class="py-2 rounded-lg text-sm font-medium transition-colors">午餐</button>
-                        <button type="button" @click="mealType='dinner'" :class="mealType==='dinner' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'" class="py-2 rounded-lg text-sm font-medium transition-colors">晚餐</button>
-                        <button type="button" @click="mealType='snack'" :class="mealType==='snack' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'" class="py-2 rounded-lg text-sm font-medium transition-colors">加餐</button>
+                        @foreach(['breakfast' => '早餐', 'lunch' => '午餐', 'dinner' => '晚餐', 'snack' => '加餐'] as $type => $label)
+                        <button type="button" @click="mealType='{{ $type }}'"
+                            :class="mealType==='{{ $type }}' ? 'bg-brand-600 text-white shadow-soft' : 'bg-black/[0.04] dark:bg-white/[0.06] text-[var(--calo-muted)]'"
+                            class="py-2.5 rounded-xl text-sm font-medium transition-colors">{{ $label }}</button>
+                        @endforeach
                     </div>
                     <input type="hidden" name="meal_type" :value="mealType">
                 </div>
 
                 <!-- Date & Time -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
+                <div class="card p-4 mb-4">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">日期</label>
-                            <input type="date" name="date" value="{{ $meal->date->format('Y-m-d') }}" max="{{ now()->toDateString() }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                            <label class="mb-1.5 block text-sm font-medium">日期</label>
+                            <input type="date" name="date" value="{{ $meal->date->format('Y-m-d') }}" max="{{ now()->toDateString() }}" class="input-field">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">时间</label>
-                            <input type="time" name="recorded_time" value="{{ $meal->recorded_at ? $meal->recorded_at->format('H:i') : '12:00' }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 dark:text-white">
+                            <label class="mb-1.5 block text-sm font-medium">时间</label>
+                            <input type="time" name="recorded_time" value="{{ $meal->recorded_at ? $meal->recorded_at->format('H:i') : '12:00' }}" class="input-field">
                         </div>
                     </div>
                 </div>
 
                 <!-- Food Info -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
-                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">食物</div>
-                    <div class="text-lg font-semibold dark:text-white">{{ $meal->food->name ?? '未知食物' }}</div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">{{ $meal->food->calories_per_100g ?? 0 }} kcal/100g</div>
+                <div class="card p-4 mb-4">
+                    <div class="mb-1 text-sm font-medium">食物</div>
+                    <div class="text-lg font-semibold">{{ $meal->food->name ?? '未知食物' }}</div>
+                    <div class="text-sm text-[var(--calo-muted)]">{{ $meal->food->calories_per_100g ?? 0 }} kcal/100g</div>
                     <input type="hidden" name="food_id" value="{{ $meal->food_id }}">
                 </div>
 
                 <!-- Serving Size -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">份量 (克)</label>
-                    <input type="number" name="serving_grams" value="{{ $meal->serving_grams }}" min="1" max="5000" step="10" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white">
+                <div class="card p-4 mb-4">
+                    <label class="mb-1.5 block text-sm font-medium">份量 (克)</label>
+                    <input type="number" name="serving_grams" value="{{ $meal->serving_grams }}" min="1" max="5000" step="10" class="input-field font-number">
                 </div>
 
                 <!-- Notes -->
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">备注</label>
-                    <input type="text" name="notes" value="{{ $meal->notes }}" class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white" placeholder="可选">
+                <div class="card p-4 mb-4">
+                    <label class="mb-1.5 block text-sm font-medium">备注</label>
+                    <input type="text" name="notes" value="{{ $meal->notes }}" class="input-field" placeholder="可选">
                 </div>
 
-                <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <button type="submit" class="btn-primary w-full py-3.5 text-[15px]">
                     保存修改
                 </button>
             </form>

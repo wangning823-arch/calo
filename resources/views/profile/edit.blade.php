@@ -12,24 +12,24 @@
         <!-- Header -->
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-400">
+                <a href="{{ route('dashboard') }}" class="text-[var(--calo-muted)]">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">编辑档案</h1>
+                <h1 class="text-lg font-semibold">编辑档案</h1>
                 <div class="w-6"></div>
             </div>
         </div>
 
         @if(session('success'))
-            <div class="mx-4 mt-4 p-3 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg text-green-700 dark:text-green-300 text-sm">
+            <div class="mx-4 mt-4 p-3 rounded-xl border border-brand-200 dark:border-brand-800/60 bg-brand-50 dark:bg-brand-900/20 text-brand-800 dark:text-brand-200 text-sm shadow-soft">
                 {{ session('success') }}
             </div>
         @endif
 
         @if($errors->any())
-            <div class="mx-4 mt-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg text-red-700 dark:text-red-300 text-sm">
+            <div class="mx-4 mt-4 p-3 rounded-xl border border-red-200 dark:border-red-800/60 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm shadow-soft">
                 @foreach($errors->all() as $error)
                     <div>{{ $error }}</div>
                 @endforeach
@@ -38,23 +38,23 @@
 
         <!-- Current Stats -->
         <div class="px-4 mt-4">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">当前数据</h2>
+            <div class="card p-4">
+                <h2 class="text-sm font-medium text-[var(--calo-muted)] mb-3">当前数据</h2>
                 <div class="grid grid-cols-3 gap-4 text-center">
                     <div>
-                        <div class="text-2xl font-bold text-blue-600">{{ $bmr ? number_format($bmr, 0) : '-' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">基础代谢(BMR)</div>
-                        <div class="text-xs text-gray-400 dark:text-gray-500">kcal/天</div>
+                        <div class="text-2xl font-bold text-brand-600 dark:text-brand-400">{{ $bmr ? number_format($bmr, 0) : '-' }}</div>
+                        <div class="text-xs text-[var(--calo-muted)]">基础代谢(BMR)</div>
+                        <div class="text-xs text-[var(--calo-muted)]">kcal/天</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-green-600">{{ $tdee ? number_format($tdee, 0) : '-' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">平衡热量(TDEE)</div>
-                        <div class="text-xs text-gray-400 dark:text-gray-500">kcal/天 · 体重不变</div>
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $tdee ? number_format($tdee, 0) : '-' }}</div>
+                        <div class="text-xs text-[var(--calo-muted)]">平衡热量(TDEE)</div>
+                        <div class="text-xs text-[var(--calo-muted)]">kcal/天 · 体重不变</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-purple-600">{{ $bmi ?: '-' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">BMI指数</div>
-                        <div class="text-xs text-gray-400 dark:text-gray-500">{{ $bmi ? ($bmi < 18.5 ? '偏瘦' : ($bmi < 24 ? '正常' : ($bmi < 28 ? '偏胖' : '肥胖'))) : '' }}</div>
+                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ $bmi ?: '-' }}</div>
+                        <div class="text-xs text-[var(--calo-muted)]">BMI指数</div>
+                        <div class="text-xs text-[var(--calo-muted)]">{{ $bmi ? ($bmi < 18.5 ? '偏瘦' : ($bmi < 24 ? '正常' : ($bmi < 28 ? '偏胖' : '肥胖'))) : '' }}</div>
                     </div>
                 </div>
             </div>
@@ -62,32 +62,32 @@
 
         <!-- Profile Form -->
         <div class="px-4 mt-4">
-            <form action="{{ route('profile.update') }}" method="POST" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 space-y-4">
+            <form action="{{ route('profile.update') }}" method="POST" class="card p-4 space-y-4">
                 @csrf
                 @method('PUT')
 
                 <!-- Name -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">昵称</label>
+                    <label for="name" class="block text-sm font-medium mb-1">昵称</label>
                     <input type="text" id="name" name="name" maxlength="50"
                            value="{{ old('name', $user->name) }}"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white"
+                           class="input-field text-sm"
                            placeholder="请输入昵称">
                 </div>
 
                 <!-- Gender -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">性别</label>
+                    <label class="block text-sm font-medium mb-2">性别</label>
                     <div class="flex gap-3" x-data="{ selected: '{{ old('gender', $user->gender) }}' }">
                         <label class="flex-1 flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'male' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
+                               :class="selected === 'male' ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/25' : 'border-[var(--calo-line)] hover:border-[var(--calo-line)]'">
                             <input type="radio" name="gender" value="male" x-model="selected" class="sr-only">
-                            <span class="text-sm font-medium dark:text-white">男</span>
+                            <span class="text-sm font-medium">男</span>
                         </label>
                         <label class="flex-1 flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'female' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
+                               :class="selected === 'female' ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/25' : 'border-[var(--calo-line)] hover:border-[var(--calo-line)]'">
                             <input type="radio" name="gender" value="female" x-model="selected" class="sr-only">
-                            <span class="text-sm font-medium dark:text-white">女</span>
+                            <span class="text-sm font-medium">女</span>
                         </label>
                     </div>
                     @error('gender')
@@ -97,15 +97,15 @@
 
                 <!-- Date of Birth -->
                 <div>
-                    <label for="date_of_birth" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">出生日期</label>
+                    <label for="date_of_birth" class="block text-sm font-medium mb-1">出生日期</label>
                     <input type="date" id="date_of_birth" name="date_of_birth"
                            value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d')) }}"
                            max="{{ now()->subYears(10)->format('Y-m-d') }}"
                            min="1920-01-01"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white"
+                           class="input-field text-sm"
                            placeholder="请选择出生日期">
                     @if($age)
-                        <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">当前 {{ $age }} 岁</p>
+                        <p class="mt-1 text-xs text-[var(--calo-muted)]">当前 {{ $age }} 岁</p>
                     @endif
                     @error('date_of_birth')
                         <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
@@ -114,32 +114,32 @@
 
                 <!-- Height -->
                 <div>
-                    <label for="height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">身高 (cm)</label>
+                    <label for="height" class="block text-sm font-medium mb-1">身高 (cm)</label>
                     <input type="number" id="height" name="height" step="0.1" min="30" max="250"
                            value="{{ old('height', $user->height) }}"
-                           class="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-white"
+                           class="input-field text-sm"
                            placeholder="请输入身高">
                 </div>
 
                 <!-- Current Weight (read-only, from latest record) -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">当前体重</label>
-                    <div class="px-3 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300 text-sm">
+                    <label class="block text-sm font-medium mb-1">当前体重</label>
+                    <div class="px-3 py-2.5 bg-black/[0.03] dark:bg-white/[0.04] rounded-lg text-[var(--calo-muted)] text-sm">
                         @php
                             $latestWeight = $user->weightRecords()->latest('date')->first();
                         @endphp
                         @if($latestWeight)
                             {{ number_format((float)$latestWeight->weight_kg, 1) . ' kg' }}
-                            <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">记录于 {{ $latestWeight->date->format('m/d') }}</span>
+                            <span class="text-xs text-[var(--calo-muted)] ml-2">记录于 {{ $latestWeight->date->format('m/d') }}</span>
                         @else
                             暂无记录
-                            <a href="{{ route('weights.create') }}" class="text-blue-500 ml-2">去记录</a>
+                            <a href="{{ route('weights.create') }}" class="text-brand-700 dark:text-brand-400 ml-2">去记录</a>
                         @endif
                     </div>
                 </div>
 
                 <!-- Submit -->
-                <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <button type="submit" class="btn-primary w-full py-3 text-sm">
                     保存修改
                 </button>
             </form>
@@ -147,23 +147,23 @@
 
         <!-- Goal Section -->
         <div class="px-4 mt-4">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                <h2 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">减重目标</h2>
+            <div class="card p-4">
+                <h2 class="text-sm font-medium text-[var(--calo-muted)] mb-3">减重目标</h2>
                 @if($currentGoal)
                     <div class="space-y-3">
                         <div class="flex justify-between items-center">
                             <div>
-                                <div class="text-sm font-medium dark:text-white">
+                                <div class="text-sm font-medium">
                                     目标体重：{{ number_format($currentGoal->target_weight, 1) . ' kg' }}
                                 </div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                <div class="text-xs text-[var(--calo-muted)]">
                                     目标日期：{{ \Carbon\Carbon::parse($currentGoal->target_date)->format('Y年m月d日') }}
                                 </div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                <div class="text-xs text-[var(--calo-muted)]">
                                     目标摄入：{{ $currentGoal->daily_calorie_budget }} kcal · 预期缺口：{{ $currentGoal->target_deficit }} kcal
                                 </div>
                             </div>
-                            <span class="text-xs px-2 py-1 rounded-full {{ $currentGoal->status === 'active' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">
+                            <span class="text-xs px-2 py-1 rounded-full {{ $currentGoal->status === 'active' ? 'bg-brand-50 dark:bg-brand-900/25 text-brand-700 dark:text-brand-300' : 'bg-black/[0.06] dark:bg-white/[0.08] text-[var(--calo-muted)]' }}">
                                 {{ $currentGoal->status === 'active' ? '进行中' : '已完成' }}
                             </span>
                         </div>
@@ -173,19 +173,19 @@
                                 $lost = $currentGoal->start_weight - $currentWeight;
                                 $progress = max(0, min(100, ($lost / $totalToLose) * 100));
                             @endphp
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full transition-all" style="width: {{ $progress }}%"></div>
+                            <div class="w-full bg-black/[0.06] dark:bg-white/[0.08] rounded-full h-2">
+                                <div class="bg-brand-600 h-2 rounded-full transition-all" style="width: {{ $progress }}%"></div>
                             </div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 text-center">已完成 {{ number_format($progress, 1) }}%</div>
+                            <div class="text-xs text-[var(--calo-muted)] text-center">已完成 {{ number_format($progress, 1) }}%</div>
                         @endif
                         <div class="flex gap-2">
-                            <a href="{{ route('goals.create') }}" class="flex-1 py-2 bg-blue-500 text-white text-center text-sm rounded-lg hover:bg-blue-600 transition">修改目标</a>
+                            <a href="{{ route('goals.create') }}" class="btn-primary flex-1 py-2 text-sm text-center">修改目标</a>
                         </div>
                     </div>
                 @else
                     <div class="text-center py-4">
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">还没有设定减重目标</p>
-                        <a href="{{ route('goals.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">设定目标</a>
+                        <p class="text-sm text-[var(--calo-muted)] mb-3">还没有设定减重目标</p>
+                        <a href="{{ route('goals.create') }}" class="btn-primary inline-flex px-4 py-2 text-sm">设定目标</a>
                     </div>
                 @endif
             </div>
@@ -193,8 +193,8 @@
 
         <!-- BMR Formula Info -->
         <div class="px-4 mt-4">
-            <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 text-xs text-gray-500 dark:text-gray-400">
-                <p class="font-medium text-gray-600 dark:text-gray-300 mb-1">计算公式 (Mifflin-St Jeor)</p>
+            <div class="bg-black/[0.03] dark:bg-white/[0.04] rounded-xl p-4 text-xs text-[var(--calo-muted)]">
+                <p class="font-medium text-[var(--calo-muted)] mb-1">计算公式 (Mifflin-St Jeor)</p>
                 <p>男：BMR = 10×体重(kg) + 6.25×身高(cm) − 5×年龄 + 5</p>
                 <p>女：BMR = 10×体重(kg) + 6.25×身高(cm) − 5×年龄 − 161</p>
                 <p class="mt-1">基础消耗 = BMR × 1.2（久坐系数）</p>

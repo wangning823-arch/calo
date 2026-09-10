@@ -11,12 +11,12 @@
     <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-300">
+                <a href="{{ route('dashboard') }}" class="text-[var(--calo-muted)]">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
                 </a>
-                <h1 class="text-lg font-semibold dark:text-white">成就墙</h1>
+                <h1 class="text-lg font-semibold">成就墙</h1>
                 <div class="w-6"></div>
             </div>
         </div>
@@ -27,26 +27,26 @@
                 $totalCount = count($badges);
             @endphp
 
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4 text-center">
-                <div class="text-3xl font-bold text-yellow-600">{{ $earnedCount }}/{{ $totalCount }}</div>
-                <div class="text-sm text-gray-500 dark:text-gray-400">已获得成就</div>
-                <div class="mt-2 bg-gray-200 rounded-full h-2">
-                    <div class="bg-yellow-500 h-2 rounded-full" style="width: {{ $totalCount > 0 ? ($earnedCount / $totalCount * 100) : 0 }}%"></div>
+            <div class="card p-4 mb-4 text-center">
+                <div class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{{ $earnedCount }}/{{ $totalCount }}</div>
+                <div class="text-sm text-[var(--calo-muted)]">已获得成就</div>
+                <div class="mt-2 bg-black/[0.06] dark:bg-white/[0.08] rounded-full h-2">
+                    <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $totalCount > 0 ? ($earnedCount / $totalCount * 100) : 0 }}%"></div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
                 @foreach($badges as $key => $badge)
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 text-center {{ $badge['earned'] ? '' : 'opacity-50' }}">
+                <div class="card p-4 text-center {{ $badge['earned'] ? '' : 'opacity-50' }}">
                     <div class="text-4xl mb-2">{{ $badge['icon'] }}</div>
-                    <div class="text-sm font-medium {{ $badge['earned'] ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500' }}">{{ $badge['name'] }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $badge['description'] }}</div>
+                    <div class="text-sm font-medium {{ $badge['earned'] ? '' : 'text-[var(--calo-muted)]' }}">{{ $badge['name'] }}</div>
+                    <div class="text-xs text-[var(--calo-muted)] mt-1">{{ $badge['description'] }}</div>
                     @if($badge['earned'] && $badge['earned_at'])
-                        <div class="text-xs text-green-600 mt-2">
+                        <div class="text-xs text-green-600 dark:text-green-400 mt-2">
                             {{ \Carbon\Carbon::parse($badge['earned_at'])->format('m/d获得') }}
                         </div>
                     @elseif(!$badge['earned'])
-                        <div class="text-xs text-gray-400 dark:text-gray-500 mt-2">未获得</div>
+                        <div class="text-xs text-[var(--calo-muted)] mt-2">未获得</div>
                     @endif
                 </div>
                 @endforeach

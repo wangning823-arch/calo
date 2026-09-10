@@ -22,7 +22,7 @@
     <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
         <div class="app-header sticky top-14 md:top-0 z-20">
             <div class="px-4 py-3 flex items-center justify-between">
-                <a href="{{ route('notifications.index') }}" class="text-gray-600">
+                <a href="{{ route('notifications.index') }}" class="text-[var(--calo-muted)]">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
@@ -33,7 +33,7 @@
         </div>
 
         @if(session('success'))
-            <div class="mx-4 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+            <div class="mx-4 mt-4 p-3 rounded-xl border border-brand-200 dark:border-brand-800/60 bg-brand-50 dark:bg-brand-900/20 text-brand-800 dark:text-brand-200 text-sm shadow-soft">
                 {{ session('success') }}
             </div>
         @endif
@@ -44,21 +44,21 @@
                 @method('PUT')
 
                 <!-- Meal Reminders -->
-                <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="card p-4">
                     <h3 class="font-medium mb-3">饮食提醒</h3>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="text-sm font-medium">早餐提醒</div>
-                                <div class="text-xs text-gray-500">提醒记录早餐</div>
+                                <div class="text-xs text-[var(--calo-muted)]">提醒记录早餐</div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="time" name="breakfast_time" value="{{ $preferences['breakfast_time'] }}"
-                                       class="text-sm border border-gray-300 rounded-lg px-2 py-1">
+                                       class="input-field text-sm">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="notification_breakfast" value="1"
                                            {{ $preferences['notification_breakfast'] ? 'checked' : '' }} class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="w-11 h-6 bg-black/10 dark:bg-white/15 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-[var(--calo-line)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -66,15 +66,15 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="text-sm font-medium">午餐提醒</div>
-                                <div class="text-xs text-gray-500">提醒记录午餐</div>
+                                <div class="text-xs text-[var(--calo-muted)]">提醒记录午餐</div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="time" name="lunch_time" value="{{ $preferences['lunch_time'] }}"
-                                       class="text-sm border border-gray-300 rounded-lg px-2 py-1">
+                                       class="input-field text-sm">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="notification_lunch" value="1"
                                            {{ $preferences['notification_lunch'] ? 'checked' : '' }} class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="w-11 h-6 bg-black/10 dark:bg-white/15 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-[var(--calo-line)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -82,15 +82,15 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="text-sm font-medium">晚餐提醒</div>
-                                <div class="text-xs text-gray-500">提醒记录晚餐</div>
+                                <div class="text-xs text-[var(--calo-muted)]">提醒记录晚餐</div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="time" name="dinner_time" value="{{ $preferences['dinner_time'] }}"
-                                       class="text-sm border border-gray-300 rounded-lg px-2 py-1">
+                                       class="input-field text-sm">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="notification_dinner" value="1"
                                            {{ $preferences['notification_dinner'] ? 'checked' : '' }} class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="w-11 h-6 bg-black/10 dark:bg-white/15 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-[var(--calo-line)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -98,21 +98,21 @@
                 </div>
 
                 <!-- Other Reminders -->
-                <div class="bg-white rounded-xl shadow-sm p-4">
+                <div class="card p-4">
                     <h3 class="font-medium mb-3">其他提醒</h3>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="text-sm font-medium">称重提醒</div>
-                                <div class="text-xs text-gray-500">提醒记录体重</div>
+                                <div class="text-xs text-[var(--calo-muted)]">提醒记录体重</div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <input type="time" name="weigh_in_time" value="{{ $preferences['weigh_in_time'] }}"
-                                       class="text-sm border border-gray-300 rounded-lg px-2 py-1">
+                                       class="input-field text-sm">
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" name="notification_weigh_in" value="1"
                                            {{ $preferences['notification_weigh_in'] ? 'checked' : '' }} class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <div class="w-11 h-6 bg-black/10 dark:bg-white/15 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-[var(--calo-line)] after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
                                 </label>
                             </div>
                         </div>
@@ -120,19 +120,19 @@
                 </div>
 
                 <!-- Cannot disable alerts -->
-                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <div class="rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-900/20 p-4">
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
                         </svg>
-                        <div class="text-sm text-yellow-700">
+                        <div class="text-sm text-amber-800 dark:text-amber-200">
                             <p class="font-medium">健康预警通知</p>
                             <p class="text-xs mt-0.5">健康预警通知不可关闭，以确保您的安全。</p>
                         </div>
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <button type="submit" class="btn-primary w-full py-3 text-sm">
                     保存设置
                 </button>
             </form>

@@ -11,7 +11,7 @@
     <div class="md:ml-64 min-h-screen pb-10 md:pb-8 page-shell">
     <div class="max-w-2xl mx-auto px-4 py-8">
         <h1 class="text-2xl font-bold mb-6">隐私政策</h1>
-        <div class="prose prose-sm text-gray-700 space-y-4">
+        <div class="prose prose-sm space-y-4">
             <p>本隐私政策说明了Calo如何收集、使用和保护您的个人信息。</p>
             <h2 class="text-lg font-semibold">一、信息收集</h2>
             <p>我们收集以下信息：手机号、姓名、性别、出生日期、身高、体重、饮食记录、运动记录。</p>
@@ -26,7 +26,7 @@
             <h2 class="text-lg font-semibold">六、数据可携权</h2>
             <p>根据PIPL，您有权获取您的个人数据副本，我们提供JSON/CSV格式的导出功能。</p>
         </div>
-        <div class="mt-8 text-xs text-gray-400">最后更新：2026年9月8日</div>
+        <div class="mt-8 text-xs text-[var(--calo-muted)]">最后更新：2026年9月8日</div>
     </div>
     </div>
 </body>
