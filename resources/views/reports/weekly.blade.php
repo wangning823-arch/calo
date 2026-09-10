@@ -42,10 +42,22 @@
                         <div class="text-xs text-gray-500 dark:text-gray-400">日均摄入 kcal</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-{{ $report['avg_deficit'] >= 0 ? 'green' : 'red' }}-600">{{ $report['avg_deficit'] >= 0 ? '-' : '+' }}{{ number_format(abs($report['avg_deficit']), 0) }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">日均缺口 kcal</div>
+                        <div class="text-2xl font-bold text-{{ $report['avg_deficit'] >= 0 ? 'green' : 'red' }}-600">{{ $report['avg_deficit'] >= 0 ? '' : '+' }}{{ number_format(abs($report['avg_deficit']), 0) }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">日均实际缺口 kcal</div>
                     </div>
                 </div>
+                @if($report['maintenance'] || $report['target_deficit'])
+                <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-gray-700 dark:text-gray-200">{{ $report['maintenance'] ? number_format($report['maintenance'], 0) : '—' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">平衡热量</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-bold text-orange-500">{{ $report['target_deficit'] !== null ? '−'.number_format($report['target_deficit'], 0) : '—' }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">预期缺口</div>
+                    </div>
+                </div>
+                @endif
             </div>
 
             @if($report['weight_change'] !== null)
@@ -104,7 +116,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 mb-4">
                 <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">健康减重天数</h3>
                 <div class="text-2xl font-bold text-green-600">{{ $report['healthy_loss_days'] }} <span class="text-sm font-normal text-gray-400 dark:text-gray-500">/ {{ $report['days_count'] }} 天</span></div>
-                <div class="text-xs text-gray-400 dark:text-gray-500">日均缺口300-750kcal为健康减重</div>
+                <div class="text-xs text-gray-400 dark:text-gray-500">日均实际缺口 300–750 kcal 为健康减重</div>
             </div>
         </div>
     </div>
@@ -143,7 +155,7 @@
                         barWidth: '40%'
                     },
                     {
-                        name: '预算',
+                        name: '目标摄入',
                         type: 'line',
                         data: stats.map(() => budget),
                         lineStyle: { type: 'dashed', color: '#ef4444' },

@@ -11,9 +11,22 @@
             ? 'nav-item-active'
             : 'text-[var(--calo-muted)] hover:bg-black/[0.03] dark:hover:bg-white/[0.04] hover:text-[var(--calo-ink)]');
     };
+    $isDashboard = $route === 'dashboard';
 @endphp
 
 <div x-data="{ drawerOpen: false }" @calo:toggle-sidebar.window="drawerOpen = !drawerOpen" @keydown.escape.window="drawerOpen = false">
+
+<!-- Global home shortcut (hidden on dashboard itself) -->
+@if(! $isDashboard)
+<a href="{{ route('dashboard') }}"
+   class="fixed z-40 bottom-20 right-4 md:bottom-6 md:right-6 inline-flex items-center gap-1.5 rounded-full bg-brand-600 text-white shadow-lift px-3.5 py-2.5 text-xs font-semibold hover:bg-brand-700 active:scale-95 transition"
+   aria-label="返回首页" title="返回首页">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+    </svg>
+    <span class="hidden sm:inline">首页</span>
+</a>
+@endif
 
 <!-- Mobile top bar with hamburger -->
 <div class="mobile-header-bar app-header sticky top-0 z-30 md:hidden">
@@ -21,10 +34,10 @@
         <button type="button" @click="drawerOpen = true" class="p-2 -ml-1 rounded-lg text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]" aria-label="打开菜单">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
-        <div class="text-center">
+        <a href="{{ route('dashboard') }}" class="text-center" aria-label="返回首页">
             <div class="text-[15px] font-semibold tracking-tight">Calo</div>
             <div class="text-[11px] text-[var(--calo-muted)] -mt-0.5">热量管理，轻松减重</div>
-        </div>
+        </a>
         <button type="button" onclick="const t=localStorage.getItem('theme'); const isDark=t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches); localStorage.setItem('theme', isDark?'light':'dark'); location.reload();" class="p-2 -mr-1 rounded-lg text-[var(--calo-muted)] hover:bg-black/[0.04] dark:hover:bg-white/[0.05]" aria-label="切换主题">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
         </button>
@@ -123,13 +136,13 @@
 <!-- Desktop sidebar -->
 <aside class="desktop-sidebar w-64 bg-white dark:bg-[#151c19] border-r border-[var(--calo-line)] fixed top-0 left-0 h-full z-30 overflow-y-auto" style="display:none;">
     <div class="p-5">
-        <div class="flex items-center gap-2.5">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5" aria-label="返回首页">
             <span class="inline-flex items-center justify-center w-10 h-10 rounded-2xl text-white font-bold text-sm shadow-soft" style="background: linear-gradient(135deg, #10b981, #047857);">C</span>
             <div>
                 <div class="text-lg font-bold tracking-tight text-[var(--calo-ink)]">Calo</div>
                 <div class="text-[11px] text-[var(--calo-muted)]">热量管理，轻松减重</div>
             </div>
-        </div>
+        </a>
     </div>
 
     <nav class="flex-1 px-3 space-y-0.5">

@@ -19,15 +19,33 @@ class MealController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+
+        $date = $this->normalizeDate($request->query('date')) ?? now()->toDateString();
+
         $records = MealRecord::where('user_id', $user->id)
             ->with('food')
+            ->whereDate('date', $date)
             ->latest('date')
             ->latest('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
         $mealTypes = ['breakfast' => '早餐', 'lunch' => '午餐', 'dinner' => '晚餐', 'snack' => '加餐'];
 
-        return view('meals.index', compact('user', 'records', 'mealTypes'));
+        return view('meals.index', compact('user', 'records', 'mealTypes', 'date'));
+    }
+
+    private function normalizeDate(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function create(Request $request)

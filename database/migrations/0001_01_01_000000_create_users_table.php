@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('height', 5, 1)->nullable();
             $table->enum('activity_level', ['sedentary', 'light', 'moderate', 'heavy'])->default('sedentary');
             $table->enum('special_group', ['none', 'pregnant', 'lactating'])->default('none');
-            $table->enum('unit_preference', ['jin', 'kg'])->default('jin');
+            $table->enum('unit_preference', ['jin', 'kg'])->default('kg');
 
             // Agreement & cancellation
             $table->timestamp('agreed_at')->nullable();

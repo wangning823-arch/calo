@@ -20,7 +20,6 @@ class ProfileUpdateRequest extends FormRequest
             'gender' => ['required', 'in:male,female'],
             'date_of_birth' => ['required', 'date', 'before:' . now()->subYears(10)->format('Y-m-d'), 'after:1920-01-01'],
             'height' => ['required', 'numeric', 'min:30', 'max:250'],
-            'unit_preference' => ['nullable', 'in:jin,kg'],
         ];
     }
 

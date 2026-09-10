@@ -72,7 +72,7 @@ class UserService
             'gender' => $data['gender'],
             'date_of_birth' => $data['date_of_birth'],
             'height' => $data['height'],
-            'unit_preference' => $data['unit_preference'] ?? $user->unit_preference ?? 'jin',
+            'unit_preference' => 'kg',
         ]);
 
         // Recalculate and update weight goal if active

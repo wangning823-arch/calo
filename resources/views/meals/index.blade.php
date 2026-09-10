@@ -22,6 +22,23 @@
 
         @include('partials.flash')
 
+        <!-- Date filter -->
+        <div class="px-4 mt-4 md:px-8">
+            <form method="GET" action="{{ route('meals.index') }}" class="card p-3">
+                <div class="flex flex-wrap items-end gap-2">
+                    <div class="flex-1 min-w-[160px] max-w-xs">
+                        <label for="date" class="block text-[11px] text-[var(--calo-muted)] mb-1">日期</label>
+                        <input type="date" id="date" name="date" value="{{ $date }}"
+                               class="w-full rounded-lg border border-[var(--calo-line)] bg-white dark:bg-white/[0.04] dark:border-white/10 px-2.5 py-2 text-sm text-[var(--calo-ink)]">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="btn-primary px-4 py-2 text-sm">查询</button>
+                        <a href="{{ route('meals.index', ['date' => now()->toDateString()]) }}" class="rounded-lg border border-[var(--calo-line)] px-3 py-2 text-sm text-[var(--calo-muted)] hover:bg-black/[0.03] dark:hover:bg-white/[0.05]">今天</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <div class="px-4 mt-4 md:px-8">
             @if($records->count() > 0)
                 <div class="card divide-y divide-[var(--calo-line)] overflow-hidden">
@@ -68,7 +85,7 @@
                     <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-flame-50 dark:bg-orange-900/25 text-flame-500">
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 6v12m4-10v12M8 8v8m8-6v10M4 10v4a2 2 0 002 2h12a2 2 0 002-2v-4"/></svg>
                     </div>
-                    <div class="font-medium">暂无饮食记录</div>
+                    <div class="font-medium">该日暂无饮食记录</div>
                     <p class="mt-1 text-sm text-[var(--calo-muted)]">记录每一餐，热量收支一目了然</p>
                     <a href="{{ route('meals.create') }}" class="btn-primary mt-4 inline-flex px-5 py-2.5 text-sm">去记录饮食</a>
                 </div>

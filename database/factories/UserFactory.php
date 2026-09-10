@@ -25,7 +25,7 @@ class UserFactory extends Factory
             'height' => fake()->randomFloat(1, 150, 200),
             'activity_level' => fake()->randomElement(['sedentary', 'light', 'moderate', 'heavy']),
             'special_group' => 'none',
-            'unit_preference' => fake()->randomElement(['jin', 'kg']),
+            'unit_preference' => 'kg',
             'remember_token' => Str::random(10),
         ];
     }

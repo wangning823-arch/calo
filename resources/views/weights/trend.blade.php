@@ -66,7 +66,7 @@
                     <div>
                         <div class="text-sm text-gray-500">当前体重</div>
                         <div class="text-2xl font-bold text-blue-600">
-                            {{ $user->unit_preference === 'jin' ? number_format($latestWeight['weight_display'], 1) . ' 斤' : number_format($latestWeight['weight_display'], 1) . ' kg' }}
+                            {{ number_format($latestWeight['weight_display'], 1) . ' kg' }}
                         </div>
                     </div>
                     <a href="{{ route('weights.create') }}" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg">
@@ -81,7 +81,7 @@
         <div class="px-4 mt-4 mb-4">
             <div class="bg-gray-100 rounded-xl p-4 text-xs text-gray-500">
                 <p class="font-medium text-gray-600 mb-1">体重波动说明</p>
-                <p>单日波动±2斤属正常现象（水分、饮食等因素影响）。请关注7日移动平均线趋势，连续2周以上无变化可能进入平台期。</p>
+                <p>单日波动±1kg属正常现象（水分、饮食等因素影响）。请关注7日移动平均线趋势，连续2周以上无变化可能进入平台期。</p>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
                     @foreach($trend['records']->reverse()->take(10) as $record)
                         <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                             <span class="text-sm text-gray-600">{{ $record['date'] }}</span>
-                            <span class="text-sm font-medium">{{ $record['weight_display'] }} {{ $user->unit_preference === 'jin' ? '斤' : 'kg' }}</span>
+                            <span class="text-sm font-medium">{{ $record['weight_display'] }} kg</span>
                         </div>
                     @endforeach
                 </div>
@@ -109,8 +109,7 @@
 
         if (chartData.length > 0) {
             const chart = echarts.init(document.getElementById('weight-chart'));
-            const unit = '{{ $user->unit_preference ?? "jin" }}';
-            const unitLabel = unit === 'jin' ? '斤' : 'kg';
+            const unitLabel = 'kg';
 
             chart.setOption({
                 tooltip: {
@@ -157,7 +156,7 @@
                     {
                         name: '7日均线',
                         type: 'line',
-                        data: movingAvg.map(v => unit === 'jin' ? (v * 2).toFixed(1) : v),
+                        data: movingAvg,
                         smooth: true,
                         lineStyle: { color: '#f59e0b', width: 2 },
                         itemStyle: { color: '#f59e0b' },

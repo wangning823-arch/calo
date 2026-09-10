@@ -41,8 +41,8 @@
                         <div class="text-xs text-gray-500">总摄入 kcal</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-2xl font-bold text-{{ $report['avg_deficit'] >= 0 ? 'green' : 'red' }}-600">{{ $report['avg_deficit'] >= 0 ? '-' : '+' }}{{ number_format(abs($report['avg_deficit']), 0) }}</div>
-                        <div class="text-xs text-gray-500">日均缺口 kcal</div>
+                        <div class="text-2xl font-bold text-{{ $report['avg_deficit'] >= 0 ? 'green' : 'red' }}-600">{{ $report['avg_deficit'] >= 0 ? '' : '+' }}{{ number_format(abs($report['avg_deficit']), 0) }}</div>
+                        <div class="text-xs text-gray-500">日均实际缺口 kcal</div>
                     </div>
                 </div>
             </div>

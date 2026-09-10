@@ -110,6 +110,11 @@
         transform: rotate(-90deg);
     }
 
+    .progress-track {
+        display: block;
+        overflow: visible;
+    }
+
     .progress-ring-circle {
         transition: stroke-dashoffset 0.7s cubic-bezier(0.22, 1, 0.36, 1);
         filter: drop-shadow(0 2px 6px rgba(5, 150, 105, 0.25));

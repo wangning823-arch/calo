@@ -43,6 +43,6 @@ class ProfileController extends Controller
         $user = $this->userService->updateProfile($request->user(), $request->validated());
 
         return redirect()->route('profile.edit')
-            ->with('success', '档案已更新，热量预算已根据新数据重新计算。');
+            ->with('success', '档案已更新，平衡热量与目标摄入已根据新数据重新计算。');
     }
 }

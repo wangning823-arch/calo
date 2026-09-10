@@ -16,12 +16,30 @@ class WeightController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+
+        $date = $this->normalizeDate($request->query('date')) ?? now()->toDateString();
+
         $records = WeightRecord::where('user_id', $user->id)
+            ->whereDate('date', $date)
             ->latest('date')
             ->latest('id')
-            ->paginate(20);
+            ->paginate(20)
+            ->withQueryString();
 
-        return view('weights.index', compact('user', 'records'));
+        return view('weights.index', compact('user', 'records', 'date'));
+    }
+
+    private function normalizeDate(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->toDateString();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function create(Request $request)

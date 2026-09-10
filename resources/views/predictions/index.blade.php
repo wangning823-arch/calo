@@ -156,15 +156,15 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2 text-center text-xs">
                         <div>
-                            <div class="font-bold text-green-600">{{ $progress['lost_jin'] }}斤</div>
+                            <div class="font-bold text-green-600">{{ $progress['lost_kg'] }}kg</div>
                             <div class="text-gray-400">已减</div>
                         </div>
                         <div>
-                            <div class="font-bold">{{ $user->unit_preference === 'jin' ? round($progress['current_weight'] * 2, 1) . '斤' : round($progress['current_weight'], 1) . 'kg' }}</div>
+                            <div class="font-bold">{{ round($progress['current_weight'], 1) }}kg</div>
                             <div class="text-gray-400">当前</div>
                         </div>
                         <div>
-                            <div class="font-bold text-blue-600">{{ $user->unit_preference === 'jin' ? round($progress['target_weight'] * 2, 1) . '斤' : round($progress['target_weight'], 1) . 'kg' }}</div>
+                            <div class="font-bold text-blue-600">{{ round($progress['target_weight'], 1) }}kg</div>
                             <div class="text-gray-400">目标</div>
                         </div>
                     </div>
@@ -185,7 +185,7 @@
                         <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
                             <div class="bg-gray-50 rounded-lg p-2 text-center">
                                 <div class="text-gray-400">还需减</div>
-                                <div class="font-bold text-orange-600">{{ $prediction['weight_remaining'] ?? '-' }}斤</div>
+                                <div class="font-bold text-orange-600">{{ $prediction['weight_remaining'] ?? '-' }}kg</div>
                             </div>
                             <div class="bg-gray-50 rounded-lg p-2 text-center">
                                 <div class="text-gray-400">预计还需</div>

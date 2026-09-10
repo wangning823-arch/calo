@@ -5,21 +5,17 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\WeightRecord;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
 
 class WeightService
 {
-    private const JIN_MIN = 20;
-    private const JIN_MAX = 300;
     private const KG_MIN = 10;
     private const KG_MAX = 150;
 
     public function recordWeight(User $user, array $data): WeightRecord
     {
-        $unit = $data['unit'] ?? $user->unit_preference ?? 'jin';
-        $weightKg = $this->convertToKg($data['weight'], $unit);
+        $weightKg = $this->toKg($data['weight'], $data['unit'] ?? null);
 
-        $this->validateWeight($weightKg, 'kg');
+        $this->validateWeight($weightKg);
 
         // Same day: update the last record instead of creating new
         $dateStr = Carbon::parse($data['date'] ?? now()->toDateString())->toDateString();
@@ -49,30 +45,20 @@ class WeightService
         ]);
     }
 
-    public function validateWeight(float $weightKg, string $unit = 'kg'): void
+    public function validateWeight(float $weightKg): void
     {
-        if ($unit === 'jin') {
-            $weightJin = $weightKg * 2;
-            if ($weightJin < self::JIN_MIN || $weightJin > self::JIN_MAX) {
-                throw new \InvalidArgumentException(
-                    "体重应在" . self::JIN_MIN . "-" . self::JIN_MAX . "斤之间。"
-                );
-            }
-        } else {
-            if ($weightKg < self::KG_MIN || $weightKg > self::KG_MAX) {
-                throw new \InvalidArgumentException(
-                    "体重应在" . self::KG_MIN . "-" . self::KG_MAX . "kg之间。"
-                );
-            }
+        if ($weightKg < self::KG_MIN || $weightKg > self::KG_MAX) {
+            throw new \InvalidArgumentException(
+                "体重应在" . self::KG_MIN . "-" . self::KG_MAX . "kg之间。"
+            );
         }
     }
 
     public function updateRecord(WeightRecord $record, array $data): WeightRecord
     {
-        $unit = $data['unit'] ?? request()->user()->unit_preference ?? 'jin';
-        $weightKg = $this->convertToKg($data['weight'], $unit);
+        $weightKg = $this->toKg($data['weight'], $data['unit'] ?? null);
 
-        $this->validateWeight($weightKg, 'kg');
+        $this->validateWeight($weightKg);
 
         $record->update([
             'weight_kg' => $weightKg,
@@ -103,16 +89,13 @@ class WeightService
             ->orderBy('date')
             ->get();
 
-        // 7-day moving average
         $movingAverage = $this->calculateMovingAverage($records, 7);
 
         return [
             'records' => $records->map(fn($r) => [
                 'date' => $r->date->format('m/d'),
                 'weight_kg' => (float) $r->weight_kg,
-                'weight_display' => $user->unit_preference === 'jin'
-                    ? round((float) $r->weight_kg * 2, 1)
-                    : round((float) $r->weight_kg, 1),
+                'weight_display' => round((float) $r->weight_kg, 1),
             ])->values(),
             'moving_average' => $movingAverage,
             'period' => $period,
@@ -135,17 +118,16 @@ class WeightService
 
         return [
             'weight_kg' => (float) $record->weight_kg,
-            'weight_display' => $user->unit_preference === 'jin'
-                ? round((float) $record->weight_kg * 2, 1)
-                : round((float) $record->weight_kg, 1),
-            'unit' => $user->unit_preference ?? 'jin',
+            'weight_display' => round((float) $record->weight_kg, 1),
+            'unit' => 'kg',
             'date' => $record->date->format('Y-m-d'),
         ];
     }
 
-    private function convertToKg(float $weight, string $unit): float
+    private function toKg(float $weight, ?string $unit): float
     {
-        return $unit === 'jin' ? $weight / 2 : $weight;
+        // Unit is kg-only; keep parameter for signature compatibility.
+        return $weight;
     }
 
     private function calculateMovingAverage($records, int $window): array

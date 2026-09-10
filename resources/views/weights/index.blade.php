@@ -35,6 +35,23 @@
             </a>
         </div>
 
+        <!-- Date filter -->
+        <div class="px-4 mt-4">
+            <form method="GET" action="{{ route('weights.index') }}" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-3">
+                <div class="flex flex-wrap items-end gap-2">
+                    <div class="flex-1 min-w-[160px] max-w-xs">
+                        <label for="date" class="block text-[11px] text-gray-500 dark:text-gray-400 mb-1">日期</label>
+                        <input type="date" id="date" name="date" value="{{ $date }}"
+                               class="w-full rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2.5 py-2 text-sm text-gray-900 dark:text-white">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700">查询</button>
+                        <a href="{{ route('weights.index', ['date' => now()->toDateString()]) }}" class="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-500 dark:text-gray-400">今天</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- Records -->
         <div class="px-4 mt-4">
             @if($records->count() > 0)
@@ -45,7 +62,7 @@
                                 <div class="flex-1">
                                     <div class="flex items-center gap-2">
                                         <span class="text-sm font-medium dark:text-white">
-                                            {{ $user->unit_preference === 'jin' ? number_format((float)$record->weight_kg * 2, 1) . ' 斤' : number_format((float)$record->weight_kg, 1) . ' kg' }}
+                                            {{ number_format((float)$record->weight_kg, 1) . ' kg' }}
                                         </span>
                                     </div>
                                     <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -75,7 +92,7 @@
                 <div class="mt-4">{{ $records->links() }}</div>
             @else
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 text-center">
-                    <div class="text-gray-400 mb-2">暂无体重记录</div>
+                    <div class="text-gray-400 mb-2">该日暂无体重记录</div>
                     <a href="{{ route('weights.create') }}" class="text-blue-500 text-sm">去记录体重</a>
                 </div>
             @endif

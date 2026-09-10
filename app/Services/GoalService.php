@@ -113,21 +113,24 @@ class GoalService
         $tdee = $userService->calculateTDEE($user);
 
         $minCalories = $user->gender === 'female' ? self::MIN_CALORIES_FEMALE : self::MIN_CALORIES_MALE;
+        $maxSafeDeficit = max(0, round($tdee - $minCalories));
+        $isOverSafe = $deficit > $maxSafeDeficit;
 
-        $rawBudget = $tdee - $deficit;
-        $isFloored = $rawBudget < $minCalories;
-        $budget = max($rawBudget, $minCalories);
-
-        // If floored, the actual achievable deficit is smaller than requested
-        $actualDeficit = $isFloored ? ($tdee - $minCalories) : $deficit;
+        // Respect the user's plan. Over-safe only triggers a warning + confirm.
+        $plannedDeficit = round($deficit);
+        $intake = round($tdee - $deficit);
 
         return [
-            'budget' => round($budget),
+            'budget' => $intake,
             'tdee' => round($tdee),
             'min_calories' => $minCalories,
-            'raw_budget' => round($rawBudget),
-            'is_floored' => $isFloored,
-            'actual_deficit' => round($actualDeficit),
+            'raw_budget' => $intake,
+            'is_floored' => $isOverSafe,
+            'is_over_safe' => $isOverSafe,
+            'planned_deficit' => $plannedDeficit,
+            'max_safe_deficit' => $maxSafeDeficit,
+            // BC alias used by older callers
+            'actual_deficit' => $plannedDeficit,
         ];
     }
 
@@ -146,7 +149,7 @@ class GoalService
             'target_weight' => $data['target_weight'],
             'target_date' => $data['target_date'],
             'daily_calorie_budget' => $budgetResult['budget'],
-            'target_deficit' => $budgetResult['actual_deficit'],
+            'target_deficit' => $budgetResult['planned_deficit'],
             'status' => 'active',
         ]);
     }
@@ -165,7 +168,7 @@ class GoalService
             'target_weight' => $targetWeight,
             'target_date' => $targetDate,
             'daily_calorie_budget' => $budgetResult['budget'],
-            'target_deficit' => $budgetResult['actual_deficit'],
+            'target_deficit' => $budgetResult['planned_deficit'],
         ]);
 
         return $goal->fresh();
@@ -179,7 +182,8 @@ class GoalService
     private function suggestTargetDate(float $currentWeight, float $targetWeight): string
     {
         $weightToLose = $currentWeight - $targetWeight;
-        $weeksNeeded = ceil($weightToLose / self::MAX_WEEKLY_LOSS_NORMAL);
+        // Prefer the sustainable rate; still reject plans faster than the hard limit
+        $weeksNeeded = ceil($weightToLose / 0.5);
 
         return Carbon::now()->addWeeks($weeksNeeded)->format('Y年m月d日');
     }

@@ -25,7 +25,7 @@ class WeightTest extends TestCase
             'date_of_birth' => '1990-01-01',
             'height' => 175.0,
             'activity_level' => 'moderate',
-            'unit_preference' => 'jin',
+            'unit_preference' => 'kg',
             'agreed_at' => now(),
         ]);
     }
@@ -39,25 +39,8 @@ class WeightTest extends TestCase
         $response->assertSee('记录体重');
     }
 
-    public function test_store_weight_record_jin(): void
-    {
-        $this->actingAs($this->user);
-
-        $response = $this->post(route('weights.store'), [
-            'weight' => 140, // 140斤 = 70kg
-            'date' => now()->toDateString(),
-        ]);
-
-        $response->assertRedirect(route('dashboard'));
-        $this->assertDatabaseHas('weight_records', [
-            'user_id' => $this->user->id,
-            'weight_kg' => 70.00,
-        ]);
-    }
-
     public function test_store_weight_record_kg(): void
     {
-        $this->user->update(['unit_preference' => 'kg']);
         $this->actingAs($this->user);
 
         $response = $this->post(route('weights.store'), [
@@ -72,20 +55,20 @@ class WeightTest extends TestCase
         ]);
     }
 
-    public function test_weight_validation_range_jin(): void
+    public function test_weight_validation_range(): void
     {
         $this->actingAs($this->user);
 
         // Too low
         $response = $this->post(route('weights.store'), [
-            'weight' => 15, // 15斤 = 7.5kg < 10kg
+            'weight' => 5,
             'date' => now()->toDateString(),
         ]);
         $response->assertSessionHasErrors('weight');
 
         // Too high
         $response = $this->post(route('weights.store'), [
-            'weight' => 350, // 350斤 = 175kg > 150kg
+            'weight' => 180,
             'date' => now()->toDateString(),
         ]);
         $response->assertSessionHasErrors('weight');
@@ -95,26 +78,23 @@ class WeightTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        // First record
         $response1 = $this->post(route('weights.store'), [
-            'weight' => 140,
+            'weight' => 70,
             'date' => now()->toDateString(),
         ]);
         $response1->assertRedirect();
 
-        // Second record same day
         $response2 = $this->post(route('weights.store'), [
-            'weight' => 142,
+            'weight' => 71,
             'date' => now()->toDateString(),
         ]);
         $response2->assertRedirect();
 
-        // Should update, not create new
         $count = WeightRecord::where('user_id', $this->user->id)->count();
         $this->assertEquals(1, $count);
 
         $record = WeightRecord::where('user_id', $this->user->id)->first();
-        $this->assertEquals(71.0, (float) $record->weight_kg); // 142/2 = 71
+        $this->assertEquals(71.0, (float) $record->weight_kg);
     }
 
     public function test_edit_weight_record(): void
@@ -142,7 +122,7 @@ class WeightTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->put(route('weights.update', $record), [
-            'weight' => 138, // 138斤 = 69kg
+            'weight' => 69.0,
         ]);
 
         $response->assertRedirect(route('weights.trend'));
@@ -169,12 +149,11 @@ class WeightTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        // Create 7 days of records
         for ($i = 6; $i >= 0; $i--) {
             WeightRecord::create([
                 'user_id' => $this->user->id,
                 'date' => now()->subDays($i)->toDateString(),
-                'weight_kg' => 70.0 + $i, // 76, 75, 74, 73, 72, 71, 70
+                'weight_kg' => 70.0 + $i,
             ]);
         }
 
@@ -221,7 +200,7 @@ class WeightTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->post(route('weights.store'), [
-            'weight' => 140,
+            'weight' => 70,
             'date' => now()->toDateString(),
             'body_fat_percentage' => 22.5,
             'waist_cm' => 82.0,

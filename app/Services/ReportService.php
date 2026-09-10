@@ -26,6 +26,12 @@ class ReportService
 
         $goal = $user->activeWeightGoal;
         $budget = $goal ? (float) $goal->daily_calorie_budget : 0;
+        $targetDeficit = $goal ? (float) $goal->target_deficit : null;
+
+        $maintenance = null;
+        if ($user->height && $user->gender) {
+            $maintenance = round(app(UserService::class)->calculateTDEE($user));
+        }
 
         // Daily stats
         $dailyStats = [];
@@ -97,7 +103,10 @@ class ReportService
 
         $daysCount = count($days);
         $avgIntake = $daysCount > 0 ? $totalIntake / $daysCount : 0;
-        $avgDeficit = $budget > 0 ? $budget - $avgIntake : 0;
+        $avgBurned = $daysCount > 0 ? $totalBurned / $daysCount : 0;
+
+        // Actual deficit vs maintenance: (TDEE + exercise) - intake
+        $avgDeficit = $maintenance ? round($maintenance + $avgBurned - $avgIntake, 1) : 0;
 
         $totalCalories = $totalProtein * 4 + $totalCarbs * 4 + $totalFat * 9;
 
@@ -111,8 +120,10 @@ class ReportService
             'total_intake' => round($totalIntake, 1),
             'total_burned' => round($totalBurned, 1),
             'avg_intake' => round($avgIntake, 1),
-            'avg_deficit' => round($avgDeficit, 1),
-            'avg_burned' => $daysCount > 0 ? round($totalBurned / $daysCount, 1) : 0,
+            'avg_deficit' => $avgDeficit,
+            'target_deficit' => $targetDeficit !== null ? (float) $targetDeficit : null,
+            'maintenance' => $maintenance,
+            'avg_burned' => round($avgBurned, 1),
             'budget' => $budget,
             'weight_start' => $startWeight ? round((float) $startWeight, 1) : null,
             'weight_end' => $endWeight ? round((float) $endWeight, 1) : null,
@@ -123,7 +134,7 @@ class ReportService
             'protein_pct' => $totalCalories > 0 ? round($totalProtein * 4 / $totalCalories * 100, 1) : 0,
             'carbs_pct' => $totalCalories > 0 ? round($totalCarbs * 4 / $totalCalories * 100, 1) : 0,
             'fat_pct' => $totalCalories > 0 ? round($totalFat * 9 / $totalCalories * 100, 1) : 0,
-            'healthy_loss_days' => $this->countHealthyLossDays($dailyStats, $budget),
+            'healthy_loss_days' => $this->countHealthyLossDays($dailyStats, $maintenance),
         ];
     }
 
@@ -230,16 +241,16 @@ class ReportService
         ];
     }
 
-    private function countHealthyLossDays(array $dailyStats, float $budget): int
+    private function countHealthyLossDays(array $dailyStats, ?float $maintenance): int
     {
-        if ($budget <= 0) {
+        if (! $maintenance || $maintenance <= 0) {
             return 0;
         }
 
         $count = 0;
         foreach ($dailyStats as $day) {
-            $deficit = $budget - $day['intake'];
-            // Healthy deficit: 300-750 kcal
+            $deficit = $maintenance + (float) $day['burned'] - (float) $day['intake'];
+            // Healthy deficit: 300-750 kcal below maintenance
             if ($deficit >= 300 && $deficit <= 750) {
                 $count++;
             }

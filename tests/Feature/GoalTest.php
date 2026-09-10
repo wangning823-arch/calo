@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\WeightGoal;
 use App\Models\WeightRecord;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -147,7 +148,84 @@ class GoalTest extends TestCase
         $response->assertRedirect(route('goals.current'));
 
         $goal = WeightGoal::where('user_id', $this->user->id)->first();
-        $this->assertGreaterThanOrEqual(1500, (float) $goal->daily_calorie_budget);
+        // User's plan is respected (not rewritten to the safety floor)
+        $this->assertGreaterThan(0, (float) $goal->daily_calorie_budget);
+        $this->assertGreaterThan(0, (float) $goal->target_deficit);
+    }
+
+    public function test_aggressive_goal_respects_user_plan_after_confirm(): void
+    {
+        $this->actingAs($this->user);
+
+        $targetDate = now()->addWeeks(5)->format('Y-m-d');
+        $response = $this->from(route('goals.create'))->post(route('goals.store'), [
+            'target_weight' => 74.0,
+            'target_date' => $targetDate,
+            'confirm_warning' => 1,
+        ]);
+
+        $response->assertRedirect(route('goals.current'));
+
+        $goal = WeightGoal::where('user_id', $this->user->id)->firstOrFail();
+        $userService = app(\App\Services\UserService::class);
+        $maintenance = round($userService->calculateTDEE($this->user));
+
+        // Same formula the backend used when storing
+        $expected = app(\App\Services\GoalService::class)
+            ->calculateRequiredDeficit(80.0, 74.0, $targetDate);
+
+        $this->assertEquals($expected['daily_deficit'], (int) $goal->target_deficit);
+        $this->assertEquals($maintenance - $expected['daily_deficit'], (int) $goal->daily_calorie_budget);
+        // Not forced up to the min intake safety floor
+        $this->assertLessThan(1500, (float) $goal->daily_calorie_budget);
+    }
+
+    public function test_max_safe_deficit_ignores_exercise(): void
+    {
+        \App\Models\ExerciseType::firstOrCreate(
+            ['name' => '快走'],
+            ['met_value' => 4.0, 'category' => 'cardio']
+        );
+
+        for ($i = 0; $i < 30; $i++) {
+            \App\Models\ExerciseRecord::create([
+                'user_id' => $this->user->id,
+                'date' => now()->subDays($i)->toDateString(),
+                'exercise_type_id' => \App\Models\ExerciseType::where('name', '快走')->first()->id,
+                'duration_minutes' => 40,
+                'intensity' => 'moderate',
+                'estimated_calories' => 300,
+            ]);
+        }
+
+        $result = app(\App\Services\GoalService::class)->calculateDailyBudget($this->user, 800);
+
+        // Max safe = TDEE - min intake only, independent of exercise logs
+        $this->assertEquals(
+            max(0, (int) round($result['tdee'] - 1500)),
+            $result['max_safe_deficit']
+        );
+    }
+
+    public function test_goal_preview_formula_matches_store(): void
+    {
+        $this->actingAs($this->user);
+
+        $targetDate = now()->addWeeks(8)->format('Y-m-d');
+        $response = $this->from(route('goals.create'))->post(route('goals.store'), [
+            'target_weight' => 76.0,
+            'target_date' => $targetDate,
+        ]);
+        $response->assertRedirect(route('goals.current'));
+
+        $goal = WeightGoal::where('user_id', $this->user->id)->firstOrFail();
+        // Invariant: target intake = maintenance - planned deficit
+        $userService = app(\App\Services\UserService::class);
+        $maintenance = round($userService->calculateTDEE($this->user));
+        $this->assertEquals(
+            $maintenance,
+            (int) $goal->daily_calorie_budget + (int) $goal->target_deficit
+        );
     }
 
     public function test_goal_completion_redirects_to_maintenance(): void

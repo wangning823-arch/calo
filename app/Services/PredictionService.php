@@ -75,7 +75,7 @@ class PredictionService
             'predicted_date_display' => $predictedDate->format('Y年m月d日'),
             'days_to_goal' => $daysToGoal,
             'daily_rate' => round($dailyRate * 1000, 1), // g/day
-            'weight_remaining' => round($weightRemaining * 2, 1), // jin
+            'weight_remaining' => round($weightRemaining, 1),
             'target_date' => $targetDate->format('Y-m-d'),
             'on_track' => $onTrack,
             'message' => $onTrack
@@ -123,9 +123,9 @@ class PredictionService
 
         return [
             'is_plateau' => true,
-            'fluctuation_kg' => round($fluctuation * 2, 1), // in jin
+            'fluctuation_kg' => round($fluctuation, 2),
             'days' => count($weights),
-            'message' => '过去14天体重波动仅' . round($fluctuation * 2, 1) . '斤，可能进入平台期。',
+            'message' => '过去14天体重波动仅' . round($fluctuation, 2) . 'kg，可能进入平台期。',
             'suggestions' => [
                 '调整热量预算：减少100-200kcal',
                 '更换运动方式：增加强度或时长',
@@ -163,13 +163,11 @@ class PredictionService
         return [
             'progress' => round($progress, 1),
             'lost_kg' => round($lost, 1),
-            'lost_jin' => round($lost * 2, 1),
             'remaining_kg' => round(max(0, $remaining), 1),
-            'remaining_jin' => round(max(0, $remaining) * 2, 1),
             'start_weight' => $startWeight,
             'current_weight' => $currentWeight,
             'target_weight' => $targetWeight,
-            'total_to_lose' => round($totalToLose * 2, 1),
+            'total_to_lose' => round($totalToLose, 1),
         ];
     }
 }

@@ -59,11 +59,11 @@
                     </div>
                     <div>
                         <div class="text-xl font-bold text-orange-500">-{{ $goal->target_deficit }}</div>
-                        <div class="text-xs text-gray-500">缺口(kcal)</div>
+                        <div class="text-xs text-gray-500">预期缺口</div>
                     </div>
                     <div>
                         <div class="text-xl font-bold text-blue-600">{{ $goal->daily_calorie_budget }}</div>
-                        <div class="text-xs text-gray-500">预算(kcal)</div>
+                        <div class="text-xs text-gray-500">目标摄入</div>
                     </div>
                 </div>
             </div>
@@ -90,8 +90,12 @@
                     <span class="font-medium">{{ $goal->target_date->format('Y年m月d日') }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">每日热量缺口</span>
+                    <span class="text-gray-600">每日预期缺口</span>
                     <span class="font-medium text-orange-500">-{{ $goal->target_deficit }} kcal/天</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">每日目标摄入</span>
+                    <span class="font-medium text-blue-600">{{ $goal->daily_calorie_budget }} kcal/天</span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-600">每周减重速率</span>

@@ -47,7 +47,7 @@
                 @if($latestWeight)
                     <div class="text-3xl font-bold text-blue-600">
                         {{ $latestWeight['weight_display'] }}
-                        <span class="text-base font-normal text-gray-500">{{ $latestWeight['unit'] === 'jin' ? '斤' : 'kg' }}</span>
+                        <span class="text-base font-normal text-gray-500">kg</span>
                     </div>
                     <div class="text-xs text-gray-400 mt-1">{{ $latestWeight['date'] }}</div>
                 @else
@@ -58,9 +58,9 @@
 
         <!-- Weight form -->
         <form action="{{ route('weights.store') }}" method="POST" class="px-4 mt-4 space-y-4"
-              x-data="{ unit: '{{ $user->unit_preference ?? 'jin' }}', weight: '{{ old('weight', $latestWeight['weight_display'] ?? '') }}' }">
+              x-data="{ weight: '{{ old('weight', $latestWeight['weight_display'] ?? '') }}' }">
             @csrf
-            <input type="hidden" name="unit" :value="unit">
+            <input type="hidden" name="unit" value="kg">
 
             <!-- Date -->
             <div class="bg-white rounded-xl shadow-sm p-4">
@@ -73,27 +73,16 @@
 
             <!-- Weight -->
             <div class="bg-white rounded-xl shadow-sm p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700">体重</label>
-                    <div class="flex gap-1 text-xs">
-                        <button type="button" @click="unit = 'jin'" class="px-2 py-1 rounded"
-                                :class="unit === 'jin' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'">斤</button>
-                        <button type="button" @click="unit = 'kg'" class="px-2 py-1 rounded"
-                                :class="unit === 'kg' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'">kg</button>
-                    </div>
-                </div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">体重</label>
                 <div class="flex items-center gap-2">
-                    <input type="number" name="weight" step="0.1"
+                    <input type="number" name="weight" step="0.1" min="10" max="150"
                            x-model="weight"
                            value="{{ old('weight', $latestWeight['weight_display'] ?? '') }}"
-                           placeholder="{{ $user->unit_preference === 'jin' ? '例：130' : '例：65' }}"
+                           placeholder="例：65"
                            class="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <span class="text-sm text-gray-500" x-text="unit === 'jin' ? '斤' : 'kg'"></span>
+                    <span class="text-sm text-gray-500">kg</span>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">
-                    <span x-show="unit === 'jin'">范围：20-300斤</span>
-                    <span x-show="unit === 'kg'">范围：10-150kg</span>
-                </p>
+                <p class="text-xs text-gray-400 mt-1">范围：10-150kg</p>
             </div>
 
             <!-- Optional measurements -->
@@ -128,7 +117,7 @@
 
             <!-- Tip -->
             <div class="bg-blue-50 rounded-xl p-3 text-xs text-blue-700">
-                单日波动±2斤属正常，请关注7日均线趋势。
+                单日波动±1kg属正常，请关注7日均线趋势。
             </div>
 
             <!-- Submit -->
@@ -147,7 +136,7 @@
                         <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                             <span class="text-sm text-gray-600">{{ $record->date->format('m/d') }}</span>
                             <span class="text-sm font-medium">
-                                {{ $user->unit_preference === 'jin' ? number_format((float)$record->weight_kg * 2, 1) . ' 斤' : number_format((float)$record->weight_kg, 1) . ' kg' }}
+                                {{ number_format((float)$record->weight_kg, 1) . ' kg' }}
                             </span>
                             <div class="flex gap-2">
                                 <a href="{{ route('weights.edit', $record) }}" class="text-xs text-blue-500">编辑</a>

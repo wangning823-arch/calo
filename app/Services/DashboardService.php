@@ -15,9 +15,16 @@ class DashboardService
         $user = User::findOrFail($userId);
         $today = Carbon::now()->toDateString();
 
-        // Get active goal for calorie budget
+        // Maintenance calories (TDEE): intake at this level keeps weight stable
+        $maintenance = null;
+        if ($user->height && $user->gender) {
+            $maintenance = round(app(UserService::class)->calculateTDEE($user));
+        }
+
+        // Goal intake ceiling and expected daily deficit
         $goal = $user->activeWeightGoal;
         $budget = $goal ? (float) $goal->daily_calorie_budget : null;
+        $targetDeficit = $goal ? (float) $goal->target_deficit : null;
 
         // Get today's meal records
         $meals = MealRecord::where('user_id', $userId)
@@ -68,12 +75,22 @@ class DashboardService
             $burnedCalories += (float) $exercise->estimated_calories;
         }
 
-        // Dynamic budget = base (from goal) + today's exercise burn
-        // Exercise calories expand what you can eat today
+        // Today's intake ceiling = goal intake + exercise (exercise expands what you can eat)
         $dynamicBudget = $budget !== null ? round($budget + $burnedCalories, 1) : null;
         $remaining = $dynamicBudget !== null ? round($dynamicBudget - $intakeCalories, 1) : null;
 
-        // Determine status (based on dynamic budget)
+        // Actual deficit vs maintenance: (TDEE + exercise) - intake
+        // Positive = below maintenance (weight loss); negative = surplus
+        $actualDeficit = $maintenance !== null
+            ? round($maintenance + $burnedCalories - $intakeCalories, 1)
+            : null;
+
+        // How far actual deficit is from the goal target (positive = on track / ahead)
+        $deficitGap = ($targetDeficit !== null && $actualDeficit !== null)
+            ? round($actualDeficit - $targetDeficit, 1)
+            : null;
+
+        // Determine status (based on dynamic intake ceiling)
         $status = 'normal';
         if ($dynamicBudget !== null && $dynamicBudget > 0) {
             $ratio = $intakeCalories / $dynamicBudget;
@@ -89,6 +106,10 @@ class DashboardService
         return [
             'budget' => $budget,
             'dynamic_budget' => $dynamicBudget,
+            'maintenance' => $maintenance,
+            'target_deficit' => $targetDeficit !== null ? (float) $targetDeficit : null,
+            'actual_deficit' => $actualDeficit,
+            'deficit_gap' => $deficitGap,
             'intake_calories' => round($intakeCalories, 1),
             'intake_protein' => round($intakeProtein, 1),
             'intake_carbs' => round($intakeCarbs, 1),

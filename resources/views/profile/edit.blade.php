@@ -48,8 +48,8 @@
                     </div>
                     <div>
                         <div class="text-2xl font-bold text-green-600">{{ $tdee ? number_format($tdee, 0) : '-' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">每日消耗(TDEE)</div>
-                        <div class="text-xs text-gray-400 dark:text-gray-500">kcal/天</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">平衡热量(TDEE)</div>
+                        <div class="text-xs text-gray-400 dark:text-gray-500">kcal/天 · 体重不变</div>
                     </div>
                     <div>
                         <div class="text-2xl font-bold text-purple-600">{{ $bmi ?: '-' }}</div>
@@ -129,29 +129,12 @@
                             $latestWeight = $user->weightRecords()->latest('date')->first();
                         @endphp
                         @if($latestWeight)
-                            {{ $user->unit_preference === 'jin' ? number_format((float)$latestWeight->weight_kg * 2, 1) . ' 斤' : $latestWeight->weight_kg . ' kg' }}
+                            {{ number_format((float)$latestWeight->weight_kg, 1) . ' kg' }}
                             <span class="text-xs text-gray-400 dark:text-gray-500 ml-2">记录于 {{ $latestWeight->date->format('m/d') }}</span>
                         @else
                             暂无记录
                             <a href="{{ route('weights.create') }}" class="text-blue-500 ml-2">去记录</a>
                         @endif
-                    </div>
-                </div>
-
-                <!-- Unit Preference -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">体重单位</label>
-                    <div class="flex gap-3" x-data="{ selected: '{{ old('unit_preference', $user->unit_preference) }}' }">
-                        <label class="flex-1 flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'jin' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="unit_preference" value="jin" x-model="selected" class="sr-only">
-                            <span class="text-sm font-medium dark:text-white">斤</span>
-                        </label>
-                        <label class="flex-1 flex items-center justify-center p-3 border rounded-lg cursor-pointer transition-all"
-                               :class="selected === 'kg' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300'">
-                            <input type="radio" name="unit_preference" value="kg" x-model="selected" class="sr-only">
-                            <span class="text-sm font-medium dark:text-white">kg</span>
-                        </label>
                     </div>
                 </div>
 
@@ -171,13 +154,13 @@
                         <div class="flex justify-between items-center">
                             <div>
                                 <div class="text-sm font-medium dark:text-white">
-                                    目标体重：{{ $user->unit_preference === 'jin' ? number_format($currentGoal->target_weight * 2, 1) . ' 斤' : number_format($currentGoal->target_weight, 1) . ' kg' }}
+                                    目标体重：{{ number_format($currentGoal->target_weight, 1) . ' kg' }}
                                 </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
                                     目标日期：{{ \Carbon\Carbon::parse($currentGoal->target_date)->format('Y年m月d日') }}
                                 </div>
                                 <div class="text-xs text-gray-500 dark:text-gray-400">
-                                    每日预算：{{ $currentGoal->daily_calorie_budget }} kcal · 缺口：{{ $currentGoal->target_deficit }} kcal
+                                    目标摄入：{{ $currentGoal->daily_calorie_budget }} kcal · 预期缺口：{{ $currentGoal->target_deficit }} kcal
                                 </div>
                             </div>
                             <span class="text-xs px-2 py-1 rounded-full {{ $currentGoal->status === 'active' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' }}">

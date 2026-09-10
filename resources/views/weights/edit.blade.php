@@ -43,15 +43,13 @@
             <div class="bg-white rounded-xl shadow-sm p-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">体重</label>
                 @php
-                    $displayWeight = $user->unit_preference === 'jin'
-                        ? number_format((float)$record->weight_kg * 2, 1)
-                        : number_format((float)$record->weight_kg, 1);
+                    $displayWeight = number_format((float)$record->weight_kg, 1);
                 @endphp
                 <div class="flex items-center gap-2">
-                    <input type="number" name="weight" step="0.1" min="10" max="300"
+                    <input type="number" name="weight" step="0.1" min="10" max="150"
                            value="{{ old('weight', $displayWeight) }}"
                            class="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm">
-                    <span class="text-sm text-gray-500">{{ $user->unit_preference === 'jin' ? '斤' : 'kg' }}</span>
+                    <span class="text-sm text-gray-500">kg</span>
                 </div>
             </div>
 

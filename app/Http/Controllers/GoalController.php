@@ -25,25 +25,32 @@ class GoalController extends Controller
         $userService = app(\App\Services\UserService::class);
         $tdee = $userService->calculateTDEE($user);
         $minCalories = $user->gender === 'female' ? 1200 : 1500;
+        $maxSafeDeficit = max(0, (int) round($tdee - $minCalories));
 
-        // Calculate smart defaults: ideal weight at BMI 22, date at 1kg/week
+        // Prefill from the active goal when editing; otherwise show recommendations
         $defaultTargetWeight = null;
         $defaultTargetDate = null;
-        if ($currentWeight && $user->height) {
+        $usingRecommendation = false;
+
+        if ($currentGoal) {
+            $defaultTargetWeight = (float) $currentGoal->target_weight;
+            $defaultTargetDate = $currentGoal->target_date->format('Y-m-d');
+        } elseif ($currentWeight && $user->height) {
+            $usingRecommendation = true;
             $heightM = (float) $user->height / 100;
             $idealWeight = 22 * $heightM * $heightM;
             $defaultTargetWeight = round($idealWeight, 1);
 
             $weightToLose = $currentWeight - $defaultTargetWeight;
             if ($weightToLose > 0) {
-                $weeksNeeded = max(1, ceil($weightToLose / 1.0));
+                $weeksNeeded = max(1, (int) ceil($weightToLose / 0.5));
                 $defaultTargetDate = \Carbon\Carbon::now()->addWeeks($weeksNeeded)->format('Y-m-d');
             }
         }
 
         return view('goals.create', compact(
             'user', 'currentGoal', 'currentWeight', 'tdee', 'minCalories',
-            'defaultTargetWeight', 'defaultTargetDate'
+            'defaultTargetWeight', 'defaultTargetDate', 'maxSafeDeficit', 'usingRecommendation'
         ));
     }
 
@@ -76,36 +83,39 @@ class GoalController extends Controller
             $request->target_date
         );
 
-        // Check if budget hits the safety floor
+        // Check if planned deficit exceeds the max safe deficit
         $budgetCheck = $this->goalService->calculateDailyBudget($user, $calc['daily_deficit']);
-        if ($budgetCheck['is_floored']) {
+        if ($budgetCheck['is_over_safe']) {
             if (! $request->boolean('confirm_warning')) {
-                $warning = '您的TDEE为' . $budgetCheck['tdee'] . 'kcal，安全最低摄入为' . $budgetCheck['min_calories'] . 'kcal，'
-                    . '最大安全缺口仅' . $budgetCheck['actual_deficit'] . 'kcal/天。'
-                    . '按此速度完成目标需要更长时间，建议将目标日期设为'
-                    . \Carbon\Carbon::now()->addDays(ceil(($calc['weight_to_lose'] * 7700) / $budgetCheck['actual_deficit']))->format('Y年m月d日')
-                    . '或减少目标减重量。是否继续？';
+                $warning = '按您的平衡热量 '.$budgetCheck['tdee'].' kcal 与最低安全摄入 '.$budgetCheck['min_calories'].' kcal，'
+                    . '最大安全缺口约 '.$budgetCheck['max_safe_deficit'].' kcal/天。'
+                    . '当前目标需每日缺口 '.$budgetCheck['planned_deficit'].' kcal（目标摄入 '.$budgetCheck['budget'].' kcal），可能偏激进。'
+                    . '仍可继续，系统会按您设定的数值生效；否则建议延长目标日期至 '
+                    . \Carbon\Carbon::now()->addDays(max(1, ceil(($calc['weight_to_lose'] * 7700) / max(1, $budgetCheck['max_safe_deficit']))))->format('Y年m月d日')
+                    . ' 附近。是否继续？';
                 return back()->with('warning', $warning)->withInput();
             }
         } elseif ($calc['is_extreme']) {
             if (! $request->boolean('confirm_warning')) {
-                $warning = '当前计划周均减重' . $calc['weekly_rate'] . 'kg，超过安全上限(1.5kg/周)。需每日亏空' . $calc['daily_deficit'] . 'kcal，可能影响健康。请确认是否继续。';
+                $warning = '当前计划周均减重 '.$calc['weekly_rate'].' kg，超过安全上限 1.5 kg/周。'
+                    . '需每日制造约 '.$calc['daily_deficit'].' kcal 缺口（目标摄入约 '.$budgetCheck['budget'].' kcal），可能影响健康。请确认是否继续。';
                 return back()->with('warning', $warning)->withInput();
             }
         } elseif ($calc['is_warning']) {
             if (! $request->boolean('confirm_warning')) {
-                $warning = '当前计划周均减重' . $calc['weekly_rate'] . 'kg，略高于推荐值(1kg/周)。每日需亏空' . $calc['daily_deficit'] . 'kcal。请确认是否继续。';
+                $warning = '当前计划周均减重 '.$calc['weekly_rate'].' kg，略高于推荐值 1 kg/周。'
+                    . '需每日制造约 '.$calc['daily_deficit'].' kcal 缺口（目标摄入约 '.$budgetCheck['budget'].' kcal）。请确认是否继续。';
                 return back()->with('warning', $warning)->withInput();
             }
         }
 
-        // Deactivate any existing active goal
+        // Deactivate any existing active goal, then create the updated plan
         $user->activeWeightGoal?->update(['status' => 'completed']);
 
         $goal = $this->goalService->createGoal($user, $request->validated());
 
         return redirect()->route('goals.current')
-            ->with('success', '减重目标已设定！每日热量预算为'.$goal->daily_calorie_budget.'kcal。');
+            ->with('success', '减重目标已设定！每日预期缺口 '.$goal->target_deficit.' kcal，目标摄入 '.$goal->daily_calorie_budget.' kcal。');
     }
 
     public function current(Request $request)

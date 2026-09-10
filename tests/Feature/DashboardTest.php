@@ -102,9 +102,75 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'budget' => 1800.0,
+            'target_deficit' => 500.0,
             'intake_calories' => 266.0,
             'remaining' => 1534.0,
         ]);
+
+        $json = $response->json();
+        $this->assertNotNull($json['maintenance']);
+        // actual deficit = maintenance + 0 exercise - 266 intake
+        $this->assertEquals($json['maintenance'] - 266.0, $json['actual_deficit']);
+        $this->assertEquals($json['actual_deficit'] - 500, $json['deficit_gap']);
+    }
+
+    public function test_actual_deficit_includes_exercise(): void
+    {
+        WeightGoal::create([
+            'user_id' => $this->user->id,
+            'mode' => 'lose',
+            'start_weight' => 80.0,
+            'target_weight' => 70.0,
+            'target_date' => now()->addMonths(3),
+            'daily_calorie_budget' => 1800,
+            'target_deficit' => 500,
+            'status' => 'active',
+        ]);
+
+        $food = FoodItem::create([
+            'name' => '测试食物',
+            'category' => '其他',
+            'calories_per_100g' => 100,
+            'protein_per_100g' => 5,
+            'carbs_per_100g' => 10,
+            'fat_per_100g' => 3,
+            'source' => 'crawled',
+            'review_status' => 'approved',
+            'is_user_custom' => false,
+            'version' => 1,
+        ]);
+
+        MealRecord::create([
+            'user_id' => $this->user->id,
+            'date' => now()->toDateString(),
+            'meal_type' => 'lunch',
+            'food_id' => $food->id,
+            'serving_grams' => 500,
+            'calculated_calories' => 500,
+        ]);
+
+        \App\Models\ExerciseType::firstOrCreate(
+            ['name' => '跑步'],
+            ['met_value' => 8.0, 'category' => 'cardio']
+        );
+
+        ExerciseRecord::create([
+            'user_id' => $this->user->id,
+            'date' => now()->toDateString(),
+            'exercise_type_id' => \App\Models\ExerciseType::where('name', '跑步')->first()->id,
+            'duration_minutes' => 30,
+            'intensity' => 'moderate',
+            'estimated_calories' => 300,
+        ]);
+
+        $this->actingAs($this->user);
+        $response = $this->getJson(route('api.dashboard.today'));
+        $json = $response->json();
+
+        $this->assertEquals(300.0, $json['burned_calories']);
+        $this->assertEquals(round($json['maintenance'] + 300 - 500, 1), $json['actual_deficit']);
+        $this->assertEquals(round(1800 + 300, 1), $json['dynamic_budget']);
+        $this->assertEquals(round(2100 - 500, 1), $json['remaining']);
     }
 
     public function test_dashboard_status_colors(): void
@@ -180,7 +246,7 @@ class DashboardTest extends TestCase
 
         $response = $this->get(route('dashboard'));
         $response->assertStatus(200);
-        $response->assertSee('连续3天');
+        $response->assertSee('连续 3 天');
     }
 
     public function test_no_goal_shows_no_budget(): void

@@ -59,9 +59,8 @@ class HealthAlertService
             return [
                 'type' => 'weekly_fast_loss',
                 'level' => 'danger',
-                'message' => '本周减重' . round($weeklyRate * 2, 1) . '斤，超过安全上限（每周3斤）。',
+                'message' => '本周减重' . round($weeklyRate, 2) . 'kg，超过安全上限（每周1.5kg）。',
                 'weekly_rate_kg' => round($weeklyRate, 2),
-                'weekly_rate_jin' => round($weeklyRate * 2, 1),
             ];
         }
 

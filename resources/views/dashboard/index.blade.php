@@ -34,25 +34,30 @@
         <div class="px-4 mt-5 md:px-8">
             <div class="card p-6 md:p-7">
                 <div class="flex flex-col items-center">
-                    <div class="relative">
-                        <svg class="progress-ring w-44 h-44" viewBox="0 0 160 160" aria-hidden="true">
+                    <div class="relative w-full max-w-md">
+                        <svg class="progress-track w-full h-[104px]" viewBox="0 0 300 104" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
                             <defs>
-                                <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                     <stop offset="0%" stop-color="#34d399"/>
                                     <stop offset="100%" stop-color="#059669"/>
                                 </linearGradient>
                             </defs>
-                            <circle cx="80" cy="80" r="70" stroke="rgba(16,185,129,0.12)" stroke-width="10" fill="none"/>
-                            <circle cx="80" cy="80" r="70"
-                                    :stroke="progressColor"
-                                    stroke-width="10" fill="none"
-                                    stroke-linecap="round"
-                                    class="progress-ring-circle"
-                                    :stroke-dasharray="439.82"
-                                    :stroke-dashoffset="progressOffset"/>
+                            <!-- Racetrack track background -->
+                            <path d="M40 16 H260 A36 36 0 0 1 260 88 H40 A36 36 0 0 1 40 16 Z"
+                                  fill="none" stroke="rgba(16,185,129,0.12)" stroke-width="10"/>
+                            <!-- Racetrack progress -->
+                            <path d="M40 16 H260 A36 36 0 0 1 260 88 H40 A36 36 0 0 1 40 16 Z"
+                                  fill="none"
+                                  :stroke="progressColor"
+                                  stroke-width="10"
+                                  stroke-linecap="round"
+                                  class="progress-ring-circle"
+                                  pathLength="100"
+                                  stroke-dasharray="100"
+                                  :stroke-dashoffset="progressOffset"/>
                         </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center">
-                            <div class="text-[2.5rem] leading-none font-number font-bold tracking-tight" :class="statusTextClass">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                            <div class="text-[2rem] leading-none font-number font-bold tracking-tight" :class="statusTextClass">
                                 <span x-text="remaining != null ? remaining : '—'"></span>
                             </div>
                             <div class="mt-1.5 text-xs text-[var(--calo-muted)]">剩余 kcal</div>
@@ -61,9 +66,23 @@
 
                     <div class="mt-5 w-full grid grid-cols-3 gap-2">
                         <div class="rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] px-2 py-3 text-center">
-                            <div class="font-number text-lg font-bold" x-text="dynamicBudget != null ? dynamicBudget : '—'"></div>
-                            <div class="mt-0.5 text-[11px] text-[var(--calo-muted)]">今日预算</div>
+                            <div class="font-number text-lg font-bold" x-text="maintenance != null ? maintenance : '—'"></div>
+                            <div class="mt-0.5 text-[11px] text-[var(--calo-muted)]">平衡热量</div>
                         </div>
+                        <div class="rounded-2xl bg-orange-50 dark:bg-orange-900/20 px-2 py-3 text-center">
+                            <div class="font-number text-lg font-bold text-orange-600 dark:text-orange-300"
+                                 x-text="targetDeficit != null ? '−' + targetDeficit : '—'"></div>
+                            <div class="mt-0.5 text-[11px] text-orange-600/70 dark:text-orange-300/70">预期缺口</div>
+                        </div>
+                        <div class="rounded-2xl px-2 py-3 text-center"
+                             :class="actualDeficitClass">
+                            <div class="font-number text-lg font-bold"
+                                 x-text="actualDeficitText"></div>
+                            <div class="mt-0.5 text-[11px] opacity-70">实际缺口</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 w-full grid grid-cols-3 gap-2">
                         <div class="rounded-2xl bg-flame-50 dark:bg-orange-900/20 px-2 py-3 text-center">
                             <div class="font-number text-lg font-bold text-flame-600 dark:text-orange-300" x-text="intake"></div>
                             <div class="mt-0.5 text-[11px] text-flame-600/70 dark:text-orange-300/70">已摄入</div>
@@ -72,18 +91,37 @@
                             <div class="font-number text-lg font-bold text-sky-600 dark:text-sky-300" x-text="burned"></div>
                             <div class="mt-0.5 text-[11px] text-sky-600/70 dark:text-sky-300/70">运动消耗</div>
                         </div>
+                        <div class="rounded-2xl bg-black/[0.03] dark:bg-white/[0.04] px-2 py-3 text-center">
+                            <div class="font-number text-lg font-bold" x-text="baseBudget != null ? baseBudget : '—'"></div>
+                            <div class="mt-0.5 text-[11px] text-[var(--calo-muted)]">目标摄入</div>
+                        </div>
                     </div>
 
-                    <p x-show="baseBudget != null && burned > 0" class="mt-3 text-xs text-[var(--calo-muted)]">
-                        基础 <span x-text="baseBudget" class="font-medium text-[var(--calo-ink)]"></span>
+                    <p x-show="maintenance != null && actualDeficit != null" class="mt-3 text-xs text-[var(--calo-muted)] text-center">
+                        平衡 <span x-text="maintenance" class="font-medium text-[var(--calo-ink)]"></span>
+                        · 今日实际
+                        <span class="font-medium" :class="(actualDeficit || 0) >= 0 ? 'text-brand-600 dark:text-brand-400' : 'text-red-500'"
+                              x-text="actualDeficitText"></span>
+                        <template x-if="targetDeficit != null && deficitGap != null">
+                            <span>
+                                ，相对目标
+                                <span class="font-medium" :class="deficitGap >= 0 ? 'text-brand-600 dark:text-brand-400' : 'text-amber-600'"
+                                      x-text="deficitGap >= 0 ? '超额 ' + deficitGap : '还差 ' + Math.abs(deficitGap)"></span>
+                                kcal
+                            </span>
+                        </template>
+                    </p>
+
+                    <p x-show="baseBudget != null && burned > 0" class="mt-1 text-xs text-[var(--calo-muted)] text-center">
+                        目标摄入 <span x-text="baseBudget" class="font-medium text-[var(--calo-ink)]"></span>
                         + 运动 <span x-text="burned" class="font-medium text-sky-600 dark:text-sky-300"></span>
-                        = 今日 <span x-text="dynamicBudget" class="font-medium text-brand-700 dark:text-brand-400"></span> kcal
+                        = 今日上限 <span x-text="dynamicBudget" class="font-medium text-brand-700 dark:text-brand-400"></span> kcal
                     </p>
 
                     @if(!$today['budget'])
                         <div class="mt-5 w-full text-center">
                             <a href="{{ route('goals.create') }}" class="btn-primary inline-flex w-full max-w-xs items-center justify-center px-5 py-3 text-sm">设定减重目标</a>
-                            <p class="mt-2 text-xs text-[var(--calo-muted)]">设定目标后即可查看每日热量预算</p>
+                            <p class="mt-2 text-xs text-[var(--calo-muted)]">设定目标后可查看预期缺口与目标摄入</p>
                         </div>
                     @endif
                 </div>
@@ -146,7 +184,7 @@
             <div class="card p-4">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-semibold">营养素摄入</h3>
-                    <span class="text-[11px] text-[var(--calo-muted)]">相对今日预算</span>
+                    <span class="text-[11px] text-[var(--calo-muted)]">相对目标摄入</span>
                 </div>
                 <div class="space-y-3.5">
                     <div>
@@ -213,11 +251,11 @@
             <a href="{{ route('weights.trend') }}" class="card flex items-center justify-between p-4 hover:shadow-lift transition-shadow">
                 <div>
                     <div class="text-sm font-semibold">最近体重</div>
-                    <div class="mt-0.5 text-xs text-[var(--calo-muted)]">{{ \Carbon\Carbon::parse($recentWeight['date'])->format('YYYY年MM月DD日') }}</div>
+                    <div class="mt-0.5 text-xs text-[var(--calo-muted)]">{{ \Carbon\Carbon::parse($recentWeight['date'])->isoFormat('YYYY年MM月DD日') }}</div>
                 </div>
                 <div class="text-right">
                     <div class="font-number text-2xl font-bold text-violet-600 dark:text-violet-300">
-                        {{ $user->unit_preference === 'jin' ? number_format($recentWeight['weight_kg'] * 2, 1) . ' 斤' : number_format($recentWeight['weight_kg'], 1) . ' kg' }}
+                        {{ number_format($recentWeight['weight_kg'], 1) . ' kg' }}
                     </div>
                     <div class="text-[11px] text-[var(--calo-muted)]">查看趋势 →</div>
                 </div>
@@ -231,6 +269,10 @@
                     baseBudget: @json($today['budget']),
                     budget: @json($today['dynamic_budget']),
                     dynamicBudget: @json($today['dynamic_budget']),
+                    maintenance: @json($today['maintenance'] ?? null),
+                    targetDeficit: @json($today['target_deficit'] ?? null),
+                    actualDeficit: @json($today['actual_deficit'] ?? null),
+                    deficitGap: @json($today['deficit_gap'] ?? null),
                     intake: @json($today['intake_calories']),
                     burned: @json($today['burned_calories']),
                     remaining: @json($today['remaining']),
@@ -243,7 +285,7 @@
                     quickExerciseOk: false,
                     onboardingStep: 0,
                     onboardingSteps: [
-                        { title: '首页看板', desc: '查看今日热量预算和摄入进度', target: 'progress-ring' },
+                        { title: '首页看板', desc: '查看平衡热量、缺口与摄入进度', target: 'progress-ring' },
                         { title: '饮食记录', desc: '点击"记录饮食"添加每餐饮食', target: 'btn-meal' },
                         { title: '运动记录', desc: '点击"记录运动"追踪运动消耗', target: 'btn-exercise' },
                         { title: '体重记录', desc: '点击"记录体重"追踪体重变化', target: 'btn-weight' },
@@ -301,10 +343,25 @@
                     get carbsPercent() { return this.budget ? (this.carbs / (this.budget * 0.5 / 4) * 100) : 0; },
                     get fatPercent() { return this.budget ? (this.fat / (this.budget * 0.2 / 9) * 100) : 0; },
 
+                    get actualDeficitText() {
+                        if (this.actualDeficit == null) return '—';
+                        const v = this.actualDeficit;
+                        return v >= 0 ? String(v) : '盈余 ' + Math.abs(v);
+                    },
+
+                    get actualDeficitClass() {
+                        if (this.actualDeficit == null) return 'bg-black/[0.03] dark:bg-white/[0.04]';
+                        if (this.actualDeficit < 0) return 'bg-red-50 dark:bg-red-900/20';
+                        if (this.targetDeficit != null && this.actualDeficit >= this.targetDeficit) {
+                            return 'bg-brand-50 dark:bg-brand-900/25';
+                        }
+                        return 'bg-amber-50 dark:bg-amber-900/20';
+                    },
+
                     get progressOffset() {
-                        if (!this.budget || this.budget <= 0) return 439.82;
-                        const pct = Math.min(1, this.intake / this.budget);
-                        return 439.82 * (1 - pct);
+                        if (!this.budget || this.budget <= 0) return 100;
+                        const pct = Math.min(1, Math.max(0, this.intake / this.budget));
+                        return 100 * (1 - pct);
                     },
 
                     get progressColor() {
