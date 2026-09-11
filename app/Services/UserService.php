@@ -72,7 +72,7 @@ class UserService
             'gender' => $data['gender'],
             'date_of_birth' => $data['date_of_birth'],
             'height' => $data['height'],
-            'activity_level' => $data['activity_level'],
+            'activity_level' => $data['activity_level'] ?? 'sedentary',
             'unit_preference' => $data['unit_preference'] ?? $user->unit_preference ?? 'jin',
         ]);
 
