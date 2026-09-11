@@ -6,9 +6,25 @@ use App\Models\ExerciseRecord;
 use App\Models\ExerciseType;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ExerciseService
 {
+    /** 常见分类优先，避免「其他」里的冷门项目排在最前 */
+    private const CATEGORY_PRIORITY = [
+        '有氧' => 0,
+        '力量' => 1,
+        '柔韧' => 2,
+        '日常' => 3,
+        '球类' => 4,
+        '水上' => 5,
+        '冬季' => 6,
+        '其他' => 7,
+    ];
+
+    private const FREQUENT_WINDOW_DAYS = 90;
+
     public function recordExercise(User $user, array $data): ExerciseRecord
     {
         $exerciseType = ExerciseType::findOrFail($data['exercise_type_id']);
@@ -106,6 +122,68 @@ class ExerciseService
     public function deleteRecord(ExerciseRecord $record): bool
     {
         return $record->delete();
+    }
+
+    /**
+     * 运动类型列表：用户近期常用的靠前，其余按常见分类与名称排序。
+     */
+    public function getExerciseTypesForUser(User $user): Collection
+    {
+        $allTypes = ExerciseType::orderBy('category')->orderBy('name')->get();
+        $frequentIds = $this->getFrequentExerciseTypeIds($user);
+
+        if ($frequentIds->isEmpty()) {
+            return $this->sortTypes($allTypes);
+        }
+
+        $frequent = $frequentIds
+            ->map(fn (int $id) => $allTypes->firstWhere('id', $id))
+            ->filter()
+            ->values();
+
+        $rest = $this->sortTypes(
+            $allTypes->whereNotIn('id', $frequent->pluck('id'))
+        );
+
+        return $frequent->concat($rest)->values();
+    }
+
+    /**
+     * @return Collection<int> 依使用频率降序的 exercise_type_id
+     */
+    public function getFrequentExerciseTypeIds(User $user): Collection
+    {
+        return ExerciseRecord::query()
+            ->where('user_id', $user->id)
+            ->where('date', '>=', now()->subDays(self::FREQUENT_WINDOW_DAYS)->toDateString())
+            ->groupBy('exercise_type_id')
+            ->orderByDesc(DB::raw('COUNT(*)'))
+            ->orderByDesc(DB::raw('MAX(date)'))
+            ->pluck('exercise_type_id')
+            ->map(fn ($id) => (int) $id)
+            ->values();
+    }
+
+    /** @return Collection<string> 分类页签顺序：常见分类靠前 */
+    public function getOrderedCategories(): Collection
+    {
+        return ExerciseType::pluck('category')
+            ->unique()
+            ->sortBy(fn (string $cat) => $this->categoryRank($cat))
+            ->values();
+    }
+
+    private function sortTypes(Collection $types): Collection
+    {
+        return $types->sortBy([
+            fn (ExerciseType $a, ExerciseType $b) => $this->categoryRank($a->category) <=> $this->categoryRank($b->category),
+            fn (ExerciseType $a, ExerciseType $b) => $a->name <=> $b->name,
+        ])->values();
+    }
+
+    private function categoryRank(string $category): int
+    {
+        return self::CATEGORY_PRIORITY[$category] ?? 99;
     }
 
     private function getUserWeight(User $user): float

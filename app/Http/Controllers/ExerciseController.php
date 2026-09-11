@@ -48,11 +48,12 @@ class ExerciseController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
-        $exerciseTypes = ExerciseType::orderBy('category')->orderBy('name')->get();
-        $categories = $exerciseTypes->pluck('category')->unique()->values();
+        $exerciseTypes = $this->exerciseService->getExerciseTypesForUser($user);
+        $frequentIds = $this->exerciseService->getFrequentExerciseTypeIds($user);
+        $categories = $this->exerciseService->getOrderedCategories();
         $now = now()->format('H:i');
 
-        return view('exercises.create', compact('user', 'exerciseTypes', 'categories', 'now'));
+        return view('exercises.create', compact('user', 'exerciseTypes', 'categories', 'frequentIds', 'now'));
     }
 
     public function store(ExerciseStoreRequest $request)
@@ -75,9 +76,9 @@ class ExerciseController extends Controller
         }
 
         $record->load('exerciseType');
-        $exerciseTypes = ExerciseType::orderBy('category')->orderBy('name')->get();
-        $categories = $exerciseTypes->pluck('category')->unique()->values();
         $user = $request->user();
+        $exerciseTypes = $this->exerciseService->getExerciseTypesForUser($user);
+        $categories = $this->exerciseService->getOrderedCategories();
 
         return view('exercises.edit', compact('record', 'exerciseTypes', 'categories', 'user'));
     }

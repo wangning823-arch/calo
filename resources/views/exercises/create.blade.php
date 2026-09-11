@@ -45,7 +45,11 @@
             </div>
 
             <!-- Category filter + Exercise type -->
-            <div class="card p-4" x-data="{ search: '', category: '' }">
+            @php
+                $frequentIdSet = collect($frequentIds)->map(fn ($id) => (int) $id)->all();
+                $hasFrequent = !empty($frequentIdSet);
+            @endphp
+            <div class="card p-4" x-data="{ search: '', category: '{{ $hasFrequent ? '常用' : '' }}' }">
                 <label class="mb-2.5 block text-sm font-semibold">运动项目</label>
 
                 <!-- Category tabs -->
@@ -55,6 +59,13 @@
                             :class="category === '' ? 'bg-brand-600 text-white shadow-soft' : 'bg-black/[0.04] dark:bg-white/[0.06] text-[var(--calo-muted)]'">
                         全部
                     </button>
+                    @if($hasFrequent)
+                        <button type="button" @click="category = '常用'"
+                                class="px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors"
+                                :class="category === '常用' ? 'bg-brand-600 text-white shadow-soft' : 'bg-black/[0.04] dark:bg-white/[0.06] text-[var(--calo-muted)]'">
+                            常用
+                        </button>
+                    @endif
                     @foreach($categories as $cat)
                         <button type="button" @click="category = '{{ $cat }}'"
                                 class="px-3 py-1 text-xs rounded-full whitespace-nowrap transition-colors"
@@ -70,13 +81,21 @@
                 <!-- Exercise list -->
                 <div class="max-h-60 overflow-y-auto space-y-2">
                     @foreach($exerciseTypes as $type)
+                        @php
+                            $isFrequent = in_array((int) $type->id, $frequentIdSet, true);
+                        @endphp
                         <label class="flex items-center p-2.5 border rounded-lg cursor-pointer transition-all text-sm"
-                               x-show="(category === '' || category === '{{ $type->category }}') && ('{{ $type->name }}'.includes(search) || search === '')"
+                               x-show="((category === '' || category === '{{ $type->category }}' @if($isFrequent) || category === '常用' @endif)) && ('{{ $type->name }}'.includes(search) || search === '')"
                                :class="selectedId == '{{ $type->id }}' ? 'border-brand-500 bg-brand-50 dark:border-brand-400 dark:bg-brand-900/25' : 'border-[var(--calo-line)] hover:border-brand-300 dark:hover:border-brand-700'">
                             <input type="radio" name="exercise_type_id" value="{{ $type->id }}"
                                    x-model="selectedId" class="sr-only">
                             <div class="flex-1">
-                                <div class="font-medium">{{ $type->name }}</div>
+                                <div class="font-medium flex items-center gap-1.5">
+                                    {{ $type->name }}
+                                    @if($isFrequent)
+                                        <span class="rounded bg-brand-50 dark:bg-brand-900/30 px-1.5 py-0.5 text-[10px] font-normal text-brand-700 dark:text-brand-300">常用</span>
+                                    @endif
+                                </div>
                                 <div class="text-xs text-[var(--calo-muted)]">{{ $type->category }} · MET {{ $type->met_value }}</div>
                             </div>
                         </label>

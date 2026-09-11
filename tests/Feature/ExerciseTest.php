@@ -254,6 +254,58 @@ class ExerciseTest extends TestCase
         $this->assertContains('日常', $categories);
     }
 
+    public function test_create_page_prioritizes_user_frequent_exercises(): void
+    {
+        $this->seed(\Database\Seeders\ExerciseTypeSeeder::class);
+
+        $fencing = ExerciseType::where('name', '击剑')->firstOrFail();
+        $archery = ExerciseType::where('name', '射箭')->firstOrFail();
+        $jogging = ExerciseType::where('name', '跑步（慢跑）')->firstOrFail();
+
+        for ($i = 0; $i < 3; $i++) {
+            ExerciseRecord::create([
+                'user_id' => $this->user->id,
+                'date' => now()->subDays($i)->toDateString(),
+                'exercise_type_id' => $jogging->id,
+                'duration_minutes' => 30,
+                'intensity' => 'moderate',
+                'estimated_calories' => 210.0,
+            ]);
+        }
+
+        $this->actingAs($this->user);
+
+        $response = $this->get(route('exercises.create'));
+        $response->assertStatus(200);
+
+        $html = $response->getContent();
+        $joggingPos = strpos($html, $jogging->name);
+        $fencingPos = strpos($html, $fencing->name);
+        $archeryPos = strpos($html, $archery->name);
+
+        $this->assertNotFalse($joggingPos);
+        $this->assertLessThan($fencingPos, $joggingPos, '常用运动应排在冷门运动之前');
+        $this->assertLessThan($archeryPos, $joggingPos, '常用运动应排在冷门运动之前');
+    }
+
+    public function test_create_page_without_history_uses_common_categories_first(): void
+    {
+        $this->seed(\Database\Seeders\ExerciseTypeSeeder::class);
+
+        $this->actingAs($this->user);
+
+        $response = $this->get(route('exercises.create'));
+        $response->assertStatus(200);
+
+        $html = $response->getContent();
+        $joggingPos = strpos($html, '跑步（慢跑）');
+        $fencingPos = strpos($html, '击剑');
+
+        $this->assertNotFalse($joggingPos);
+        $this->assertNotFalse($fencingPos);
+        $this->assertLessThan($fencingPos, $joggingPos, '无历史时常见有氧运动应排在冷门项目之前');
+    }
+
     public function test_api_exercise_types(): void
     {
         $this->actingAs($this->user);
