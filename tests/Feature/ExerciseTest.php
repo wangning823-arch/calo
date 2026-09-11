@@ -158,7 +158,7 @@ class ExerciseTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->delete(route('exercises.destroy', $record));
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('exercises.index', ['date' => $record->date->toDateString()]));
         $this->assertSoftDeleted('exercise_records', ['id' => $record->id]);
     }
 

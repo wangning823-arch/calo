@@ -133,6 +133,15 @@ class MealController extends Controller
             'meal_type' => ['required', 'in:breakfast,lunch,dinner,snack'],
             'serving_grams' => ['required', 'numeric', 'min:1', 'max:5000'],
             'recorded_time' => ['nullable', 'date_format:H:i'],
+        ], [
+            'serving_grams.required' => '请填写饮食份量（克）。',
+            'serving_grams.numeric' => '饮食份量必须是数字。',
+            'serving_grams.min' => '饮食份量不能少于1克。',
+            'serving_grams.max' => '饮食份量不能超过5000克。',
+            'meal_type.required' => '请选择餐次。',
+            'meal_type.in' => '餐次无效。',
+            'food_id.required' => '请选择食物。',
+            'food_id.exists' => '所选食物不存在。',
         ]);
 
         $data = $request->only(['food_id', 'meal_type', 'serving_grams', 'notes']);
@@ -160,7 +169,7 @@ class MealController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->route('dashboard')
+        return redirect()->route('meals.index', ['date' => $meal->date->toDateString()])
             ->with('success', '记录已删除。');
     }
 

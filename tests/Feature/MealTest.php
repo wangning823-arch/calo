@@ -151,7 +151,7 @@ class MealTest extends TestCase
         ]);
 
         $response = $this->delete(route('meals.destroy', $record));
-        $response->assertRedirect(route('dashboard'));
+        $response->assertRedirect(route('meals.index', ['date' => $record->date->toDateString()]));
         $this->assertSoftDeleted('meal_records', ['id' => $record->id]);
     }
 
@@ -177,6 +177,32 @@ class MealTest extends TestCase
             'meal_type' => 'lunch',
             'notes' => '复制自昨日',
         ]);
+    }
+
+    public function test_update_meal_with_common_serving_grams(): void
+    {
+        $this->actingAs($this->user);
+
+        $record = MealRecord::create([
+            'user_id' => $this->user->id,
+            'date' => now()->toDateString(),
+            'meal_type' => 'lunch',
+            'food_id' => $this->food->id,
+            'serving_grams' => 100,
+            'calculated_calories' => 133,
+        ]);
+
+        foreach ([50, 100, 150, 200, 250] as $grams) {
+            $response = $this->put(route('meals.update', $record), [
+                'food_id' => $this->food->id,
+                'meal_type' => 'lunch',
+                'serving_grams' => $grams,
+            ]);
+
+            $response->assertSessionHasNoErrors();
+            $record->refresh();
+            $this->assertEquals($grams, (float) $record->serving_grams);
+        }
     }
 
     public function test_serving_grams_validation(): void

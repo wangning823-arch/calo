@@ -110,7 +110,7 @@ class ExerciseController extends Controller
 
         $this->exerciseService->deleteRecord($record);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('exercises.index', ['date' => $record->date->toDateString()])
             ->with('success', '运动记录已删除。');
     }
 

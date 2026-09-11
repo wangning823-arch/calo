@@ -141,7 +141,7 @@ class WeightTest extends TestCase
         $this->actingAs($this->user);
 
         $response = $this->delete(route('weights.destroy', $record));
-        $response->assertRedirect(route('weights.trend'));
+        $response->assertRedirect(route('weights.index', ['date' => $record->date->toDateString()]));
         $this->assertSoftDeleted('weight_records', ['id' => $record->id]);
     }
 

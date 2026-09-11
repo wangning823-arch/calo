@@ -101,7 +101,7 @@ class WeightController extends Controller
 
         $this->weightService->deleteRecord($record);
 
-        return redirect()->route('weights.trend')
+        return redirect()->route('weights.index', ['date' => $record->date->toDateString()])
             ->with('success', '体重记录已删除。');
     }
 
